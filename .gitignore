@@ -1,0 +1,9 @@
+# Never commit model weights, images or content archives
+*.gguf
+*.safetensors
+*.zim
+*.iso
+*.img
+archive/
+build/
+*.log

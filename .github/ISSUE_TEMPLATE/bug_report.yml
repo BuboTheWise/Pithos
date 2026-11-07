@@ -1,0 +1,38 @@
+name: Bug report
+description: Something in the docs, scripts or install steps is wrong or broken.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: input
+    id: step
+    attributes:
+      label: Doc / step / script
+      placeholder: e.g. INSTALL-DEBIAN13.md section 7, or pithos-install
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Mode
+      options: [Install / setup, Desktop, Server, Cluster, Not applicable]
+  - type: textarea
+    id: versions
+    attributes:
+      label: Versions
+      description: Paste the output of the commands below.
+      value: |
+        uname -r:
+        apt policy mesa-vulkan-drivers | head -3:
+        ollama --version:
+        N.O.M.A.D. version:
+        cat /etc/os-release | head -2:
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: e.g. `journalctl -u ollama -b`, `docker ps`, script output.
+      render: shell

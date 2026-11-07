@@ -1,0 +1,57 @@
+name: Hardware report
+description: Share results from a real build: what worked, what didn't, numbers.
+labels: ["hardware"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Hardware reports clear `[UNVERIFIED]` marks. Partial reports and failures are welcome too.
+        **Safety:** don't post photos showing serial numbers or your location if you'd rather keep them private.
+  - type: input
+    id: board
+    attributes:
+      label: Board / machine
+      placeholder: ASRock/AMD BC-250 (or Framework laptop, 3090 desktop, ...)
+    validations:
+      required: true
+  - type: input
+    id: bios
+    attributes:
+      label: BIOS and VRAM setup
+      placeholder: e.g. BC250_3.00_CHIPSETMENU, UMA 512 MB, IOMMU off  /  bc250memcfg UMA_SIZE 512
+  - type: textarea
+    id: software
+    attributes:
+      label: Software stack
+      value: |
+        Distro + version:
+        Kernel (uname -r):
+        Mesa (apt policy mesa-vulkan-drivers):
+        vulkaninfo --summary deviceName:
+        Governor + version:
+        mem_info_gtt_total:
+        Ollama version / llama.cpp commit:
+        N.O.M.A.D. version (stock installer? y/n):
+        40-CU unlock (y/n):
+  - type: textarea
+    id: build
+    attributes:
+      label: Physical build
+      description: Case, PSU, cooling, lid open/closed, power source (grid / power station / inverter / solar).
+  - type: textarea
+    id: bench
+    attributes:
+      label: Benchmarks
+      description: Output of `tools/ollama-bench.sh` (model, quant, context, tok/s).
+      render: text
+  - type: textarea
+    id: power_temps
+    attributes:
+      label: Power and temperatures
+      description: Wall watts (idle / load), GPU/CPU temps, backplate temp if measured.
+  - type: textarea
+    id: notes
+    attributes:
+      label: What worked, what didn't
+    validations:
+      required: true

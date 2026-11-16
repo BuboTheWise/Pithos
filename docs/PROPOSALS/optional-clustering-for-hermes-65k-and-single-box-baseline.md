@@ -18,7 +18,7 @@ This is strictly more powerful than a single "larger" box because it pools ident
 - **Model:** qwen3.5:9b (6.6 GB)
 - **Context:** 65536 (ollama_num_ctx and config context_length)
 - **Reasoning:** ULTRA enabled (user override). Note: MEMORY.md still carries legacy warning that ULTRA adds 120s+ pre-tool latency and recommends "none" to avoid timeouts. User reports it improves quality for solo work despite the cost.
-- **Endpoint:** Ollama OpenAI compat at local or box address (http://bubo-1:11434/v1 in current config).
+- **Endpoint:** Ollama OpenAI compat at local or box address (e.g. http://<workhorse-hostname>:11434/v1 in current config).
 - **Performance observations (from recent agent.log):**
   - Large context first passes (20k–40k+ tokens): 47s–151s+ (some outliers to 700s+ in broader log samples).
   - Cache-hit follow-up turns: 3s–15s typical.

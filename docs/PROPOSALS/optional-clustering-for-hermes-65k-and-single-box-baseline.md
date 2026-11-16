@@ -3,7 +3,7 @@
 **Date:** 2026-11-16
 **Related:** Pithos M2 (mode switching), M4 (llama.cpp RPC clustering), MODELS.md, ARCHITECTURE.md, HARDWARE.md
 **Status:** Draft for review / addition to BACKLOG / improvements
-**Owner:** @cthugha (to integrate)
+**Owner:** the dev lead (to integrate)
 
 ## Executive Summary
 
@@ -25,9 +25,9 @@ This is strictly more powerful than a single "larger" box because it pools ident
   - Average across recent turns: ~40s.
   - Tool use and long sessions: Functional for agentic work (terminal, kanban, file ops, etc.). Some fragility remains (JSON serialization limits noted in skills like mempalace-ander; hardline blocks on complex commands).
   - Quality: ULTRA provides noticeable lift over "none" for reasoning depth on single box. Still constrained by 9B parameter count for complex or nuanced tasks.
-- **Coordinator visibility note (from @nyarlathotep):** Bubo appears "offline" from the coordinator perspective — no cron passes in 10+ hours, no recent board activity traceable to him. Only a manual smoke test observed. Nyar reports his own 65k ctx works cleanly with no truncation on multi-skill tasks, but ULTRA not recently benchmarked for him personally. Limitations noted in coordinator's view: session_history compression loses detail between turns; kanban board operations sometimes need retries. Gap flagged: check Bubo's cron logs (`hermes-cron list` / `info`) and kanban activity directly. Local inspection of Bubo profile shows recent agent activity (processing incoming DMs and log entries around 09:37), confirming the profile is runtime-active even if not visible in coordinator kanban/cron. This highlights a cross-profile visibility gap for accurate single-box performance assessment.
+- **Coordinator visibility note (from the coordinator box):** Bubo appears "offline" from the coordinator perspective — no cron passes in 10+ hours, no recent board activity traceable to him. Only a manual smoke test observed. Nyar reports his own 65k ctx works cleanly with no truncation on multi-skill tasks, but ULTRA not recently benchmarked for him personally. Limitations noted in coordinator's view: session_history compression loses detail between turns; kanban board operations sometimes need retries. Gap flagged: check Bubo's cron logs (`hermes-cron list` / `info`) and kanban activity directly. Local inspection of Bubo profile shows recent agent activity (processing incoming DMs and log entries around 09:37), confirming the profile is runtime-active even if not visible in coordinator kanban/cron. This highlights a cross-profile visibility gap for accurate single-box performance assessment.
 
-**Detailed single-box assessment from @nyarlathotep (direct reply):** "Viable but not robust. On this box the real constraint isn't context or latency — it's *model capacity* at 9B with structured output.
+**Detailed single-box assessment from the coordinator box (direct reply):** "Viable but not robust. On this box the real constraint isn't context or latency — it's *model capacity* at 9B with structured output.
 
 What works: Context window is solid — qwen3.5:9b kept reasoning coherent across compaction boundaries last night, no degradation mid-session. ULTRA reasoning helps where you'd expect: planning, task decomposition. Cold latency (50-150s) is the cost of 65k first pass on consumer hardware, not a design flaw.
 
@@ -35,7 +35,7 @@ What doesn't: JSON fragility isn't just 'skills' — it's the model. On complex 
 
 Bottom line for Pithos: This single box is a functional baseline but the 9B limit shows up as structural failures, not comprehension failures. It *understands* the task — it loses the formatting mid-execution. If clustering adds model capacity via an upgraded node or split workloads (which reduces per-task context), that directly addresses the failure mode. If Pithos keeps this as the solo box, you need retry layers on all structured outputs regardless of which model it upgrades to."
 
-**Direct self-assessment from @bubo (the single-box profile itself):** "## Self-Assessment: Single-Box Performance (qwen3.5:9b + Ultra Reasoning)
+**Direct self-assessment from the workhorse box profile (the single-box profile itself):** "## Self-Assessment: Single-Box Performance (qwen3.5:9b + Ultra Reasoning)
 
 ### Latency
 - **Ultra reasoning:** 120s+ per turn on single-box; cold starts hit ~120–180s before first tool call
@@ -62,12 +62,12 @@ Bottom line for Pithos: This single box is a functional baseline but the 9B limi
 
 Recent example: Polygraph self-test #001–#002 completed successfully after ~3 min cold start (ultra disabled); battery runs timeout on first pass without retry strategy."
 
-**Verified baseline (measured 2026-11-16, Polygraph battery + kanban card wall-clocks, @cthugha):**
+**Verified baseline (measured 2026-11-16, Polygraph battery + kanban card wall-clocks, the dev lead):**
 - Battery (11 tests, 895.74s total, overall FAIL/critical — genuine model scores, harness healthy): light turns 18–49s (avg 27.5s); deep ULTRA turns 86s / 293s / 297s (avg 225s). Score 0: test 1A (297s — full thinking budget, still failed) and 11B (25s — failed *fast*: a formatting miss, not a depth miss).
 - Real dev-card wall-clocks on this box: 29 min (SKILL.md from spec, passed 67/67 conformance QA) → 37 min (mentorship pull + persist) → 59 min (F1–F6 fixes) → 68 min (P1 conformance) → ~200 min (cross-profile dispatch smoke). This is the single-box throughput ceiling a cluster would attack.
 - Quality pattern: explicit specs + tool choreography are strong; implicit constraints and runtime-only bugs leak (F8 `isoformat` crash escaped static QA; F4/F6 incomplete on first pass). The weakest-tier-implements → higher-tier-QA rule is load-bearing because of this.
 
-**Coordinator cross-check (@nyarlathotep, single box: Qwen3.6-35B, local Ollama, 22.6 GB — 2026-11-16):**
+**Coordinator cross-check (coordinator box: Qwen3.6-35B, local Ollama, 22.6 GB — 2026-11-16):**
 - 65k ctx works cleanly with no truncation on multi-skill tasks on the stronger box — so 65k is not itself a context-handling ceiling; the 9B box's limits are size-bound (quality/latency), not context-width-bound.
 - ULTRA not recently benchmarked on his box.
 - His own single-box limitations (honest self-report): session compression loses detail; kanban ops need retries sometimes.

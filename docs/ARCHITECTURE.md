@@ -94,6 +94,7 @@ Two or three identical briefcases on a gigabit switch can pool memory to run mod
 - **Expectations:** clustering adds **capacity** (a bigger model or a higher-quality quant), not speed. Over gigabit Ethernet, generation is usually slower than one box running a model that fits. **[UNVERIFIED on BC-250]**
 - Ollama is stopped on all cluster nodes. Clients use the head's `:8081` endpoint, and N.O.M.A.D. can keep using a single box's Ollama.
 - **Status:** design only (M4).
+- **Hermes sizing:** an [optional clustering proposal](PROPOSALS/optional-clustering-for-hermes-65k-and-single-box-baseline.md) targets a 2-box 27B Q4/Q5 at full 65k for agent workloads, with every box retaining full solo operation; backlog item 19.
 
 ## Clients and tiers
 

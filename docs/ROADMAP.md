@@ -12,6 +12,14 @@ Status: **pre-alpha / planning.** The milestones are ordered by dependency. Date
 | **M5** | **Image builder** | Debian live-build image with layers 1-3, first-boot wizard, offline package cache | Flash USB → working box with no internet |
 | **M6** | **Multi-distro** | Adopt **[nomad-unchained](https://github.com/BuboTheWise/nomad-unchained)** (BuboTheWise) for N.O.M.A.D. on non-Debian bases; package lists per distro family; CI matrix. Push changes upstream to N.O.M.A.D. wherever upstream will accept them. | At least one non-Debian family (e.g. Fedora or Arch) passes the M1 checklist |
 
+## Hardware testing
+
+|  | Item | Notes | Status |
+|---|---|---|---|
+| TBD-1 | `[ ]` Build and test the single-unit closed-case cooling | `[ ]` | `#TBD` |
+| TBD-2 | `[ ]` Benchmark the default 1G direct cluster interlink (two units) | `[ ]` | `#TBD` |
+| TBD-3 | `[ ]` Qualify the optional RTL8157 5GbE link on the BC-250 if 1G prefill is a problem | `[ ]` | `#TBD` |
+
 ## Principles for every milestone
 
 - **Upstream first.** Fixes that help everyone go to N.O.M.A.D., llama.cpp, Ollama or the BC-250 community projects, not into a Pithos fork.

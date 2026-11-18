@@ -28,6 +28,7 @@ Prices are owner snapshots from late October 2026 and change constantly. Some re
 | 2 | nyacom "AMD BC-250 Industrial Style Case for FlexATX" (Printables model **1737913**) | 3D-printed, designed around the Apevia PSU. Print in PETG (PLA softens at ~55-60 °C). Optional handle part. | filament TBD |
 | 3 | Apevia ITX-PFC500W FlexATX PSU | 12 V ~33 A. Has headroom for the 40-CU unlock. | ~49.99 |
 | 4 | Apache 4800 hard case (Harbor Freight) | Interior ~454 × 327 × 168 mm. Lid fan ports allow lid-closed running. | ~59.99 |
+**See also:** [HARDWARE-SINGLE.md](../HARDWARE-SINGLE.md) — alternative enclosure design (vented bottom panel with pull fan). Note: HARDWARE.md states Apache 4800 has lid fan ports, but the Harbor Freight listing does not mention any.
 | 5 | Lid intake and exhaust ports with filters, plus printed plenums | Ports sit over the fan end and the hot end, 300 mm or more apart, with a divider so air doesn't recirculate. **[UNVERIFIED] thermal performance with the lid closed.** | TBD |
 | 6 | Fused IEC **C14** panel inlet | The **only** power entry. 5×20 mm **6.3 A slow-blow** fuse. Earth bonded to PE. | TBD |
 | 7 | 120 mm high-static-pressure PWM fan(s) and filters | Per the nyacom design | TBD |

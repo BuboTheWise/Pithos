@@ -1,0 +1,53 @@
+# Single unit airflow path (D2). Flow estimates [EST].
+# Render: d2 --layout=dagre d2-airflow.d2 d2-airflow.svg  (and .png)
+classes: {
+  hot: {style: {fill: "#fee2e2"; stroke: "#d1242f"; stroke-width: 2}}
+  cool: {style: {fill: "#dbeafe"; stroke: "#1f6feb"; stroke-width: 2}}
+  warn: {style: {fill: "#fff7ed"; stroke: "#e07b00"; stroke-width: 2}}
+  ok: {style: {fill: "#dcfce7"; stroke: "#1a7f37"; stroke-width: 2}}
+  gray: {style: {fill: "#f3f4f6"; stroke: "#6b7280"}}
+  psu: {style: {fill: "#fde68a"; stroke: "#92400e"}}
+  note: {style: {fill: "#ffffff"; stroke: "#6b7280"; stroke-dash: 3; font-size: 14}}
+}
+direction: down
+title: "Single unit: airflow path (case lying on its lid, panel up)" {shape: text; style.font-size: 28}
+outside_in: "Outside, intake side" {
+  style: {fill: "#eff6ff"; stroke: "#1f6feb"}
+  room: "Room air" {class: cool}
+  hoodA: "Louvered intake hood A (rain shed)" {class: cool}
+  hoodB: "Louvered intake hood B (cabin make-up)" {class: cool}
+  room -> hoodA
+  room -> hoodB
+}
+panel: "Vented bottom panel" {
+  style: {fill: "#e5e7eb"; stroke: "#24292f"; stroke-width: 3}
+  winA: "Window A 105 x 105 mm\n+ 120 mm washable filter\nover the case-fan opening" {class: cool}
+  winB: "Window B 80 x 80 mm + filter\ncabin make-up air" {class: cool}
+  hole: "Round fan hole Ø130 mm\n86% of the slot open area is exposed\n(the other 14% is blocked by the panel)" {class: hot}
+}
+inside: "Inside the base (no real seal: case on 3 mm bumper pads)" {
+  style: {fill: "#f8fafc"; stroke: "#475569"}
+  cfan: "Case fan P12 Pro PST\npushes (about 40-49 CFM [EST])" {class: cool}
+  hs: "Stock heatsink + BC-250" {class: gray}
+  slot: "Eight 76 x 6 mm slots\n35.9 cm2 open" {class: hot}
+  psu: "PSU (28-42 W into the cabin [EST])" {class: psu}
+  cabin: "Cabin air" {class: gray}
+  cfan -> hs -> slot
+  psu -> cabin: "heat"
+}
+outside_out: "Outside, exhaust side" {
+  style: {fill: "#fef2f2"; stroke: "#d1242f"}
+  fan: "Noctua NF-A14x25 G2 PWM 140 mm\nbolted to the OUTER face, pulls (about 24 CFM alone through the slots [EST])" {class: hot}
+  guard: "Steel guard" {class: hot}
+  hood: "External deflector hood (the only shunt)\n60 mm tall,\ntwo open sides (-y, -x), 168 cm2 outlet;\nbaffle on the window A side;\nabout 89 mm proud of the panel" {class: hot}
+  out: "Hot exhaust leaves AWAY from windows A and B" {class: hot}
+  fan -> guard -> hood -> out
+}
+outside_in.hoodA -> panel.winA
+outside_in.hoodB -> panel.winB
+panel.winA -> inside.cfan: "cool air in"
+panel.winB -> inside.cabin: "make-up air (windows A, B and leaks)"
+inside.cabin -> panel.hole: "pull fan draws cabin air and PSU heat\nout through the gaps and nyacom's own vents\n[UNVERIFIED how well]" {style.stroke-dash: 4}
+inside.slot -> panel.hole: "hot air straight out"
+panel.hole -> outside_out.fan
+outside_out.hood -> outside_in.hoodA: "RECIRCULATION RISK:\nintake air must stay under +2 K above room (test)" {style: {stroke: "#d1242f"; stroke-dash: 4}}

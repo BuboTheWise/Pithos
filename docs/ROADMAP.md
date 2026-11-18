@@ -16,9 +16,9 @@ Status: **pre-alpha / planning.** The milestones are ordered by dependency. Date
 
 |  | Item | Notes | Status |
 |---|---|---|---|
-| TBD-1 | `[ ]` Build and test the single-unit closed-case cooling | `[ ]` | `#TBD` |
-| TBD-2 | `[ ]` Benchmark the default 1G direct cluster interlink (two units) | `[ ]` | `#TBD` |
-| TBD-3 | `[ ]` Qualify the optional RTL8157 5GbE link on the BC-250 if 1G prefill is a problem | `[ ]` | `#TBD` |
+| [#22](https://github.com/BuboTheWise/Pithos/issues/22) | `[ ]` Determine nyacom case cover compatibility — neo vs classic | `[ ]` | **Open** |
+| [#23](https://github.com/BuboTheWise/Pithos/issues/23) | `[ ]` Build and test the single-unit closed-case cooling | `[ ]` | **Open** |
+| [#24](https://github.com/BuboTheWise/Pithos/issues/24) | `[ ]` Benchmark the default 1G direct cluster interlink (two units) | `[ ]` | **Open** |
 
 ## Principles for every milestone
 

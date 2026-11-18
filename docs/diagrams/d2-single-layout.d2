@@ -1,0 +1,44 @@
+# Single unit floor plan (D2, SCHEMATIC, not to scale; the dimensioned plan is single-layout-top.svg).
+# Render: d2 --layout=dagre d2-layout.d2 d2-layout.svg  (and .png)
+classes: {
+  hot: {style: {fill: "#fee2e2"; stroke: "#d1242f"; stroke-width: 2}}
+  cool: {style: {fill: "#dbeafe"; stroke: "#1f6feb"; stroke-width: 2}}
+  warn: {style: {fill: "#fff7ed"; stroke: "#e07b00"; stroke-width: 2}}
+  ok: {style: {fill: "#dcfce7"; stroke: "#1a7f37"; stroke-width: 2}}
+  gray: {style: {fill: "#f3f4f6"; stroke: "#6b7280"}}
+  psu: {style: {fill: "#fde68a"; stroke: "#92400e"}}
+  note: {style: {fill: "#ffffff"; stroke: "#6b7280"; stroke-dash: 3; font-size: 14}}
+}
+grid-columns: 1
+grid-gap: 20
+title: "Single unit: floor plan (Apache 5800, panel up, seen from the lid side)" {shape: text; style.font-size: 28}
+plan: "Apache 5800 interior 514 x 289 x 144 mm: INSIDE face of the vented bottom panel" {
+  style: {fill: "#f6f8fa"; stroke: "#24292f"; stroke-width: 3}
+  grid-columns: 3
+  grid-gap: 12
+  io: "I/O end wall: 80 mm clear for plugs\nLAN jack (RJ45 bulkhead)\n1 ft Cat6 from the board" {class: warn}
+  ny: "nyacom case, UNMODIFIED (175 x 125 x 339 mm)\nshared face on 3 mm bumper pads against the INSIDE\nof the panel (no seal); hold-down brackets on the long sides" {
+    style: {fill: "#f8fafc"; stroke: "#475569"}
+    grid-columns: 2
+    grid-gap: 6
+    slot: "Eight 76 x 6 mm slanted slots (35.9 cm2)\n86% exposed by the Ø130 mm hole\n(the rest is blocked by the panel)" {class: hot}
+    cf: "Case-fan opening\nunder window A" {class: cool}
+    bd: "BC-250 + stock heatsink" {class: gray}
+    psu: "PSU (Apevia)" {class: psu}
+  }
+  ac: "PSU end: 95 mm clear (175 mm spare in total)\nONE fused C14 inlet (6.3 A) on the long side wall\nat the PSU end, mains to the PSU" {class: warn}
+  gap: "orientation: closed and running,\ncase lies on its LID, panel UP;\nupright: panel sideways,\nkeep 100 mm clear\naround the hood outlets" {class: note}
+  winb: "Window B 80 x 80 mm + filter\ncabin make-up air, beside the case" {class: cool}
+  feet: "protective rubber feet\non the LID (not the panel)" {class: note}
+}
+outside: "OUTSIDE the panel (seen from outside; schematic): fans, hoods, caps" {
+  style: {fill: "#fffbeb"; stroke: "#e07b00"}
+  grid-columns: 3
+  grid-gap: 8
+  fan: "Noctua NF-A14x25 G2 140 mm\nbolted to the OUTER face\nover a Ø130 mm hole\n+ steel guard" {class: hot}
+  hood: "External deflector hood, 60 mm\nTWO open sides: -y and -x, 168 cm2\nbaffle toward window A\nthe ONLY shunt" {class: hot}
+  ia: "Intake hood A (louvered)\ncap + reed 2" {class: cool}
+  ib: "Intake hood B (louvered)\ncap + reed 3" {class: cool}
+  ec: "Exhaust cap on the hood outlet\n+ reed 1" {class: warn}
+  nt: "Hood outlets point away from both\nwindows. No real seal: the pull fan\ndraws from the whole enclosure" {class: note}
+}

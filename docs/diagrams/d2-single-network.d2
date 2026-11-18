@@ -1,0 +1,30 @@
+# Single unit network wiring (D2). Render: d2 --layout=dagre d2-network.d2 d2-network.svg
+direction: down
+classes: {
+  hot: {style: {fill: "#fee2e2"; stroke: "#d1242f"; stroke-width: 2}}
+  cool: {style: {fill: "#dbeafe"; stroke: "#1f6feb"; stroke-width: 2}}
+  warn: {style: {fill: "#fff7ed"; stroke: "#e07b00"; stroke-width: 2}}
+  ok: {style: {fill: "#dcfce7"; stroke: "#1a7f37"; stroke-width: 2}}
+  gray: {style: {fill: "#f3f4f6"; stroke: "#6b7280"}}
+  psu: {style: {fill: "#fde68a"; stroke: "#92400e"}}
+  note: {style: {fill: "#ffffff"; stroke: "#6b7280"; stroke-dash: 3; font-size: 14}}
+}
+title: "Single unit: network wiring" {shape: text; style.font-size: 28}
+briefcase: "Single unit (Apache 5800)" {
+  style: {fill: "#fdf4ff"; stroke: "#a855f7"}
+  brd: "BC-250\nonboard 1 GbE + Wi-Fi 7 adapter\nOllama :11434, N.O.M.A.D. :8080" {class: gray}
+  p1: "1 ft Cat6 (internal)" {class: gray}
+  lan: "RJ45 bulkhead: LAN\n(onboard 1 GbE; becomes the\ncluster interlink when paired)" {class: warn}
+  wifi: "Wi-Fi 7 adapter\n(LAN, esp. when clustered)" {class: ok}
+  brd -> p1 -> lan
+  brd -> wifi
+}
+sw: "LAN switch or router, or Wi-Fi AP" {class: gray}
+clients: "Laptop, phone, Hermes, other clients" {class: gray}
+disk: "Content disk,\nNexDock keyboard/touchpad" {class: gray}
+nex: "NexDock (HDMI route)" {class: gray}
+briefcase.lan -> sw: "Cat6 patch (2 ft+)"
+briefcase.wifi -> sw: "Wi-Fi 7" {style.stroke-dash: 4}
+sw -> clients
+briefcase.brd -> disk: "USB" {style.stroke-dash: 4}
+briefcase.brd -> nex: "DisplayPort (via adapter)" {style.stroke-dash: 4}

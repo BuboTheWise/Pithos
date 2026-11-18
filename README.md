@@ -90,6 +90,7 @@ Pithos is an independent community project. It isn't affiliated with Crosstalk S
 |---|---|
 | [ARCHITECTURE](docs/ARCHITECTURE.md) | The layers, from base OS to clustering |
 | [HARDWARE](docs/HARDWARE.md) | Briefcase bill of materials, power, safety |
+| [HARDWARE-SINGLE](docs/HARDWARE-SINGLE.md) | Single-unit hardware (one BC-250 in an Apache 5800), measured nyacom case, closed-case cooling, BOM, clustering units over default 1G direct cable (optional 5GbE; a 5GBASE-T switch for three or more), test protocol (draft) |
 | [INSTALL-DEBIAN13](docs/INSTALL-DEBIAN13.md) | Step-by-step Milestone 1 install |
 | [MODELS](docs/MODELS.md) | Model tiers, picks per machine, the archive approach |
 | [ROADMAP](docs/ROADMAP.md) | Milestones M0-M6 |

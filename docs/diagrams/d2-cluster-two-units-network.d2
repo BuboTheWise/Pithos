@@ -1,0 +1,36 @@
+# Two single units clustered, network (D2). Default: 1G direct cable between onboard 1G ports.
+# Render: d2 --layout=dagre d2-cluster-two-units-network.d2 d2-cluster-two-units-network.svg
+direction: down
+classes: {
+  hot: {style: {fill: "#fee2e2"; stroke: "#d1242f"; stroke-width: 2}}
+  cool: {style: {fill: "#dbeafe"; stroke: "#1f6feb"; stroke-width: 2}}
+  warn: {style: {fill: "#fff7ed"; stroke: "#e07b00"; stroke-width: 2}}
+  ok: {style: {fill: "#dcfce7"; stroke: "#1a7f37"; stroke-width: 2}}
+  gray: {style: {fill: "#f3f4f6"; stroke: "#6b7280"}}
+  psu: {style: {fill: "#fde68a"; stroke: "#92400e"}}
+  note: {style: {fill: "#ffffff"; stroke: "#6b7280"; stroke-dash: 3; font-size: 14}}
+}
+title: "Two single units clustered (default): 1G direct cable, no switch, no 5GbE adapters" {shape: text; style.font-size: 28}
+ua: "Single unit A (head)" {
+  style: {fill: "#eff6ff"; stroke: "#1f6feb"}
+  a: "BC-250\nhead llama-server :8081" {class: gray}
+  al: "LAN jack\n(onboard 1 GbE, used as interlink)" {class: ok}
+  aw: "Wi-Fi 7 adapter (LAN)" {class: warn}
+  a -> al: "onboard 1 GbE"
+  a -> aw: "LAN"
+}
+ub: "Single unit B (worker)" {
+  style: {fill: "#f0fdf4"; stroke: "#1a7f37"}
+  b: "BC-250\nggml-rpc-server :50052" {class: gray}
+  bl: "LAN jack\n(onboard 1 GbE, used as interlink)" {class: ok}
+  bw: "Wi-Fi 7 adapter (LAN)" {class: warn}
+  b -> bl: "onboard 1 GbE"
+  b -> bw: "LAN"
+}
+ua.al <-> ub.bl: "one Cat6 patch (2 ft)\n1G direct link, RPC :50052" {style: {stroke: "#1a7f37"; stroke-width: 4}}
+wifi: "LAN (Wi-Fi 7, not the cluster path)" {class: gray}
+c: "Clients and Hermes: head :8081 /v1" {class: gray}
+ua.aw -> wifi
+ub.bw -> wifi
+wifi -> c
+note: "Never run cluster (RPC) traffic over Wi-Fi.\nUSB 5GbE adapters (ULANSeN / Realtek RTL8157, about 60 USD a pair plus cable) are an optional upgrade if 1G prefill is too slow." {class: note; style.font-size: 16}

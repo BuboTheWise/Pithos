@@ -1,0 +1,41 @@
+# Single unit power wiring and cap interlock (D2).
+# Render: d2 --layout=dagre d2-power.d2 d2-power.svg  (and .png)
+classes: {
+  hot: {style: {fill: "#fee2e2"; stroke: "#d1242f"; stroke-width: 2}}
+  cool: {style: {fill: "#dbeafe"; stroke: "#1f6feb"; stroke-width: 2}}
+  warn: {style: {fill: "#fff7ed"; stroke: "#e07b00"; stroke-width: 2}}
+  ok: {style: {fill: "#dcfce7"; stroke: "#1a7f37"; stroke-width: 2}}
+  gray: {style: {fill: "#f3f4f6"; stroke: "#6b7280"}}
+  psu: {style: {fill: "#fde68a"; stroke: "#92400e"}}
+  note: {style: {fill: "#ffffff"; stroke: "#6b7280"; stroke-dash: 3; font-size: 14}}
+}
+direction: down
+title: "Single unit: power wiring and cap interlock" {shape: text; style.font-size: 28}
+src: "120 V AC source\n(wall, inverter AC outlet or power-station AC outlet)" {class: gray}
+case: "Case (Apache 5800)" {
+  style: {fill: "#fdf4ff"; stroke: "#a855f7"}
+  inlet: "ONE fused C14 inlet + switch\nfuse 6.3 A slow-blow, 5x20 mm (long side wall, PSU end)" {class: warn}
+  jump: "1 ft C13 jumper (cut from a C13-C14 cord)\n18 AWG L / N / PE, insulated, strain-relieved" {class: warn}
+  ny: "nyacom FlexATX case (unmodified)" {
+    style: {fill: "#f8fafc"; stroke: "#475569"}
+    psu: "Apevia ITX-PFC500W\n+12 V rail 33 A" {class: psu}
+    board: "BC-250\nPCIe 8-pin 12 V\nCHECK POLARITY before power-on" {class: gray}
+    cfan: "Case fan: P12 Pro PST x1 (not LN)\n0.33 A, pushes through the heatsink" {class: cool}
+    psu -> board: "PCIe 8-pin, 16 AWG+\nno SATA/Molex-to-PCIe adapters"
+    psu -> cfan: "12 V fan lead"
+  }
+  il: "Cap interlock (series loop, see d2-interlock)" {
+    style: {fill: "#fff7ed"; stroke: "#e07b00"}
+    sw: "nyacom latching switch\nPS_ON to GND" {class: gray}
+    r1: "Reed 1: exhaust cap" {class: warn}
+    r2: "Reed 2: intake A cap" {class: warn}
+    r3: "Reed 3: intake B cap" {class: warn}
+    sw -> r1 -> r2 -> r3
+  }
+  inlet -> jump: "L, N, PE"
+  jump -> ny.psu
+  il.r3 -> ny.psu: "PS_ON to GND\nbreaks if ANY cap is fitted" {style.stroke-dash: 4}
+}
+xfan: "Pull fan OUTSIDE the panel, under its hood\nNoctua NF-A14x25 G2 PWM x1\nMolex-to-fan lead via a grommeted hole, 0.19 A max" {class: hot}
+src -> case.inlet: "standard C13 cord"
+case.ny.psu -> xfan: "12 V fan lead"

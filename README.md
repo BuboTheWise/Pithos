@@ -37,7 +37,7 @@ You should be comfortable with a Linux terminal and with basic electrical safety
 | Part | Reference choice |
 |---|---|
 | Compute | ASRock/AMD **BC-250**: Cyan Skillfish APU (GPU gfx1013), 16 GB shared GDDR6, stock heatsink |
-| Inner case | nyacom "Industrial Style Case for FlexATX" (Printables model 1737913), 3D printed |
+| Inner case | nyacom "Industrial Style Case for FlexATX" ([Printables 1737913](https://www.printables.com/model/1737913) • [printed kit on eBay](https://www.ebay.com/itm/236997099720?var=537406080449)), 3D printed |
 | Power supply | Apevia ITX-PFC500W FlexATX, inside the printed case |
 | Outer case | Apache 4800 hard case with filtered lid fan ports, so it can run with the lid closed |
 | Power entry | One fused IEC C14 AC inlet. Runs from any 120 V source: grid, a power station (e.g. Segway Cube with 200-400 W of portable solar), or the kit inverter on a 12 V battery |
@@ -75,10 +75,9 @@ Milestone 2 adds desktop/server mode switching, and Milestone 4 adds clustering.
 
 **Pre-alpha, planning stage.** This repository currently contains design and install documentation. Many details are marked **[UNVERIFIED]** until someone confirms them on real hardware. Prices and package versions are snapshots from late October and early November 2026.
 
-## Relationship to Project N.O.M.A.D. and nomad-unchained
+## Relationship to Project N.O.M.A.D.
 
 - **[Project N.O.M.A.D.](https://github.com/Crosstalk-Solutions/project-nomad)** (Crosstalk Solutions, Apache-2.0) supplies the offline library and the AI chat front end. Upstream targets Debian-based systems, with Ubuntu recommended. **Pithos Milestone 1 uses the stock upstream installer, unmodified, on Debian 13.** Debian 13 isn't on upstream's named support list, so this is [UNVERIFIED] until tested.
-- **[nomad-unchained](https://github.com/BuboTheWise/nomad-unchained)** is a fork, maintained by BuboTheWise, that makes the N.O.M.A.D. installer work beyond Debian (apt, dnf, pacman). Pithos plans to adopt it at the **multi-distro milestone (M6)**. Pithos also contributes issues and fixes there.
 - **Upstream first.** Wherever a change helps everyone, such as a Vulkan GPU path in N.O.M.A.D. or installer fixes, Pithos aims to get it merged upstream instead of carrying a fork. The fork is a bridge, not a destination.
 - Pithos owns the parts specific to this hardware: kernel and Mesa versions, the GPU governor, memory tuning, host Vulkan inference, mode switching, clustering, the hardware build and, later, a flashable image.
 
@@ -90,6 +89,7 @@ Pithos is an independent community project. It isn't affiliated with Crosstalk S
 |---|---|
 | [ARCHITECTURE](docs/ARCHITECTURE.md) | The layers, from base OS to clustering |
 | [HARDWARE](docs/HARDWARE.md) | Briefcase bill of materials, power, safety |
+| [HARDWARE-SINGLE](docs/HARDWARE-SINGLE.md) | Single-unit hardware (one BC-250 in an Apache 5800), measured nyacom case, closed-case cooling, BOM, clustering units over default 1G direct cable (optional 5GbE; a 5GBASE-T switch for three or more), test protocol (draft) |
 | [INSTALL-DEBIAN13](docs/INSTALL-DEBIAN13.md) | Step-by-step Milestone 1 install |
 | [MODELS](docs/MODELS.md) | Model tiers, picks per machine, the archive approach |
 | [ROADMAP](docs/ROADMAP.md) | Milestones M0-M6 |

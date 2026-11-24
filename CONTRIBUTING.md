@@ -11,7 +11,7 @@ Thank you for helping. Pithos is in **pre-alpha / planning**. Right now the most
 
 ## Ground rules
 
-- **Upstream first.** If a fix belongs in Project N.O.M.A.D., nomad-unchained, llama.cpp, Ollama, or a BC-250 community project, send it there and link it here.
+- **Upstream first.** If a fix belongs in Project N.O.M.A.D., llama.cpp, Ollama, or a BC-250 community project, send it there and link it here.
 - **Keep Debian 13 as the reference path.** Changes for other distros must not alter Debian behavior.
 - **Verify links and commands.** Every URL in the docs should load. Every `ollama pull` should resolve. Don't add guessed links.
 - **Mark the unproven.** Use `[UNVERIFIED]` for anything not tested on real hardware, and `[EST]` for estimates.

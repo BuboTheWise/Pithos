@@ -1,0 +1,35 @@
+# Two single units clustered, placement (D2, SCHEMATIC). Default interlink: 1G direct.
+# Render: d2 --layout=dagre d2-cluster-two-units-layout.d2 d2-cluster-two-units-layout.svg  (and .png)
+classes: {
+  hot: {style: {fill: "#fee2e2"; stroke: "#d1242f"; stroke-width: 2}}
+  cool: {style: {fill: "#dbeafe"; stroke: "#1f6feb"; stroke-width: 2}}
+  warn: {style: {fill: "#fff7ed"; stroke: "#e07b00"; stroke-width: 2}}
+  ok: {style: {fill: "#dcfce7"; stroke: "#1a7f37"; stroke-width: 2}}
+  gray: {style: {fill: "#f3f4f6"; stroke: "#6b7280"}}
+  psu: {style: {fill: "#fde68a"; stroke: "#92400e"}}
+  note: {style: {fill: "#ffffff"; stroke: "#6b7280"; stroke-dash: 3; font-size: 14}}
+}
+direction: down
+title: "Two single units clustered: placement (I/O ends face each other, side by side)" {shape: text; style.font-size: 28}
+ua: "Unit A (head): Apache 5800 + nyacom case" {
+  style: {fill: "#eff6ff"; stroke: "#1f6feb"}
+  grid-columns: 2
+  grid-gap: 8
+  pa: "vented panel UP\nfan + hood + windows\n100 mm or more clear around the hood outlets" {class: hot}
+  io: "I/O end 80 mm clear: LAN jack used as the 1G interlink" {class: ok}
+  ac: "PSU end 95 mm clear; fused C14 inlet on the side wall" {class: warn}
+  bd: "BC-250\nhead llama-server :8081\nLAN via Wi-Fi 7 adapter" {class: gray}
+}
+gap: "150 mm or more apart\nnever stack one on the other\none Cat6 between the onboard 1G ports\n1G direct link, RPC :50052" {class: ok}
+ub: "Unit B (worker): Apache 5800 + nyacom case" {
+  style: {fill: "#f0fdf4"; stroke: "#1a7f37"}
+  grid-columns: 2
+  grid-gap: 8
+  io: "I/O end 80 mm clear: LAN jack used as the 1G interlink" {class: ok}
+  pa: "vented panel UP\nfan + hood + windows\n100 mm or more clear around the hood outlets" {class: hot}
+  bd: "BC-250\nggml-rpc-server :50052\nLAN via Wi-Fi 7 adapter" {class: gray}
+  ac: "PSU end 95 mm clear; fused C14 inlet on the side wall" {class: warn}
+}
+ua -> gap: "" {style: {stroke: "#1a7f37"; stroke-width: 4}}
+gap -> ub: "" {style: {stroke: "#1a7f37"; stroke-width: 4}}
+note: "Each unit keeps its own AC inlet, bottom-panel pull fan and intake windows.\nSingle unit numbers apply per unit. The default cluster adds only a short Cat6.\nLAN is each board's Wi-Fi 7 adapter. Never run cluster traffic over Wi-Fi.\nUSB 5GbE adapters are an optional upgrade if 1G prefill is a problem." {class: note}

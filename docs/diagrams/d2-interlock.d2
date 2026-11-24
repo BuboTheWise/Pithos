@@ -1,0 +1,23 @@
+# Transport-cap interlock (D2), single unit (3 reeds in series).
+# Render: d2 --layout=dagre d2-interlock.d2 d2-interlock.svg
+direction: down
+classes: {
+  hot: {style: {fill: "#fee2e2"; stroke: "#d1242f"; stroke-width: 2}}
+  cool: {style: {fill: "#dbeafe"; stroke: "#1f6feb"; stroke-width: 2}}
+  warn: {style: {fill: "#fff7ed"; stroke: "#e07b00"; stroke-width: 2}}
+  ok: {style: {fill: "#dcfce7"; stroke: "#1a7f37"; stroke-width: 2}}
+  gray: {style: {fill: "#f3f4f6"; stroke: "#6b7280"}}
+  psu: {style: {fill: "#fde68a"; stroke: "#92400e"}}
+  note: {style: {fill: "#ffffff"; stroke: "#6b7280"; stroke-dash: 3; font-size: 14}}
+}
+title: "Remove-before-power-on interlock (per board)" {shape: text; style.font-size: 28}
+psu: "Apevia PSU\nPS_ON pin (green wire)" {class: psu}
+sw: "nyacom latching switch\n(PS_ON to GND)" {class: gray}
+r1: "Reed 1 (MC-38, NO)\nexhaust-hood cap" {class: warn}
+r2: "Reed 2 (MC-38, NO)\nintake window A cap" {class: warn}
+r3: "Reed 3 (MC-38, NO)\nintake window B cap" {class: warn}
+gnd: "PSU GND (black wire)" {class: psu}
+psu -> sw: "PS_ON"
+sw -> r1 -> r2 -> r3 -> gnd: "series loop"
+rule: "Logic. MC-38 NO is open while its magnet is near.\nAll caps OFF: all 3 reeds closed, switch closed, PS_ON tied to GND, PSU on.\nANY cap fitted: that reed opens, loop broken, PSU cannot start (and shuts down if a cap is fitted while running).\nCheck each reed's contact state with a multimeter before wiring; a welded-closed reed defeats it,\nso keep the visible REMOVE BEFORE POWER-ON tag."
+rule.class: note

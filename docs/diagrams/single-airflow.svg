@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 784 612" width="784" height="612" font-family="Helvetica,Arial,sans-serif" font-size="12">
+<title>Pithos single airflow section</title>
+<rect width="784" height="612" fill="#fff"/>
+<defs><marker id="ab" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#1f6feb"/></marker><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#d1242f"/></marker><marker id="ao" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#e07b00"/></marker><marker id="ag" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#1a7f37"/></marker></defs>
+<rect x="36.0" y="219.0" width="642.5" height="180.0" fill="#f6f8fa" stroke="#24292f" stroke-width="3"/>
+<text x="36" y="22" text-anchor="start" font-size="13" font-weight="bold">Single unit: Apache 5800 (HF 64819): section through window A, lying on its lid (panel up)</text>
+<rect x="36.0" y="212.8" width="151.9" height="6.2" fill="#24292f"/>
+<rect x="350.4" y="212.8" width="51.2" height="6.2" fill="#24292f"/>
+<rect x="532.9" y="212.8" width="145.6" height="6.2" fill="#24292f"/>
+<text x="674.5" y="391.0" text-anchor="end" font-size="10" fill="#6e7781">top edge = vented bottom panel (faces up)</text>
+<rect x="181.6" y="181.5" width="175.0" height="31.2" fill="#fecaca" stroke="#d1242f" stroke-width="1.5"/>
+<text x="269.1" y="201.1" text-anchor="middle" font-size="10">140 mm pull fan, outer face</text>
+<rect x="181.6" y="176.5" width="175.0" height="5.0" fill="#9ca3af" stroke="#4b5563"/>
+<rect x="181.6" y="101.5" width="175.0" height="75.0" fill="#fef2f2" stroke="#d1242f" stroke-width="2"/>
+<text x="269.1" y="114.5" text-anchor="middle" font-size="10" fill="#d1242f">external deflector hood</text>
+<text x="269.1" y="126.5" text-anchor="middle" font-size="10" fill="#d1242f">(rain-shed, cap mount)</text>
+<text x="269.1" y="138.5" text-anchor="middle" font-size="10" fill="#d1242f">baffle walls toward the windows</text>
+<circle cx="209.1" cy="163.5" r="7" fill="#fff" stroke="#d1242f" stroke-width="2"/><circle cx="209.1" cy="163.5" r="2.3" fill="#d1242f"/>
+<text x="221.1" y="167.5" font-size="10" fill="#d1242f">outlet out of page (-y and -x)</text>
+<line x1="181.6" y1="154.0" x2="147.6" y2="154.0" stroke="#d1242f" stroke-width="3" marker-end="url(#ar)"/>
+<rect x="161.0" y="219.0" width="31.2" height="3.8" fill="#374151"/>
+<rect x="503.5" y="219.0" width="31.2" height="3.8" fill="#374151"/>
+<path d="M98.5,220.9 L151.0,220.9" stroke="#6e7781" stroke-width="2" stroke-dasharray="3 2" fill="none" marker-end="url(#ar)"/>
+<rect x="136.0" y="222.8" width="423.8" height="156.2" fill="none" stroke="#6e7781" stroke-width="2" stroke-dasharray="3 3"/>
+<rect x="398.5" y="225.2" width="136.2" height="33.8" fill="#bfdbfe" stroke="#1f6feb"/>
+<text x="467.2" y="244.0" text-anchor="middle" font-size="10">case fan P12 Pro</text>
+<rect x="158.5" y="265.2" width="367.5" height="65.0" fill="#e2e8f0" stroke="#475569"/>
+<text x="298.5" y="300.2" text-anchor="middle" font-size="10">BC-250 + stock heatsink</text>
+<rect x="457.2" y="310.2" width="82.5" height="50.0" fill="#fde68a" stroke="#92400e"/>
+<text x="498.5" y="337.8" text-anchor="middle" font-size="10">PSU</text>
+<line x1="164.8" y1="222.8" x2="373.5" y2="222.8" stroke="#6b7280" stroke-width="5"/>
+<line x1="187.9" y1="222.8" x2="350.4" y2="222.8" stroke="#d1242f" stroke-width="5"/>
+<text x="169.8" y="240.2" text-anchor="start" font-size="9" fill="#374151">slot field 167 mm (grey = blocked)</text>
+<line x1="36.0" y1="347.8" x2="136.0" y2="347.8" stroke="#92400e" stroke-width="1.5"/>
+<text x="86.0" y="343.8" text-anchor="middle" font-size="9" fill="#92400e">I/O 80 mm</text>
+<line x1="579.8" y1="219.0" x2="579.8" y2="379.0" stroke="#92400e" stroke-width="1.5"/>
+<line x1="574.8" y1="219.0" x2="584.8" y2="219.0" stroke="#92400e"/><line x1="574.8" y1="379.0" x2="584.8" y2="379.0" stroke="#92400e"/>
+<text x="585.8" y="329.0" font-size="10" fill="#92400e">inside 128 mm</text>
+<text x="585.8" y="341.0" font-size="10" fill="#92400e">of 144 mm</text>
+<line x1="376.6" y1="212.8" x2="376.6" y2="101.5" stroke="#92400e" stroke-width="1.5"/>
+<text x="381.6" y="109.0" font-size="10" fill="#92400e">outside</text><text x="381.6" y="121.0" font-size="10" fill="#92400e">+89 mm</text>
+<rect x="36.0" y="399.0" width="642.5" height="6.2" fill="#24292f"/>
+<rect x="86.0" y="405.2" width="25.0" height="8.8" fill="#374151"/>
+<rect x="603.5" y="405.2" width="25.0" height="8.8" fill="#374151"/>
+<line x1="26.0" y1="414.0" x2="688.5" y2="414.0" stroke="#6e7781" stroke-width="2"/>
+<text x="357.2" y="428.0" text-anchor="middle" font-size="10" fill="#6e7781">protective rubber feet on the LID; the case rests on them (table or ground)</text>
+<polygon points="395.4,212.8 395.4,180.2 539.1,187.8 539.1,212.8" fill="none" stroke="#1f6feb" stroke-width="2"/>
+<rect x="179.1" y="91.5" width="180.0" height="8.8" fill="none" stroke="#e07b00" stroke-width="2" stroke-dasharray="5 3"/>
+<rect x="392.2" y="170.2" width="150.0" height="7.5" fill="none" stroke="#e07b00" stroke-width="2" stroke-dasharray="5 3"/>
+<text x="357.2" y="86.5" text-anchor="middle" font-size="10" fill="#e07b00">dashed orange: magnetic transport caps (fitted only when packed; reed interlock blocks power-on)</text>
+<line x1="467.2" y1="162.8" x2="467.2" y2="225.2" stroke="#1f6feb" stroke-width="3" marker-end="url(#ab)"/>
+<text x="467.2" y="142.8" text-anchor="middle" font-size="11" fill="#1f6feb">cool air in</text>
+<path d="M467.2,225.2 L467.2,235.2" stroke="#1f6feb" stroke-width="2.5" fill="none" marker-end="url(#ab)"/>
+<line x1="467.2" y1="279.0" x2="398.5" y2="279.0" stroke="#e07b00" stroke-width="3" marker-end="url(#ao)"/>
+<text x="323.5" y="345.2" text-anchor="middle" font-size="10" fill="#e07b00">case fan pushes air through the stock heatsink</text>
+<path d="M336.0,279.0 L294.1,227.8" stroke="#d1242f" stroke-width="3" fill="none" marker-end="url(#ar)"/>
+<line x1="269.1" y1="225.2" x2="269.1" y2="169.0" stroke="#d1242f" stroke-width="3.5" marker-end="url(#ar)"/>
+<text x="36" y="452" font-size="12">Estimates [EST] except the nyacom geometry (STL, measured). The eight 76 x 6 mm slots have only 35.9 cm2 of</text>
+<text x="36" y="468" font-size="12">open area, so the slot exit is the main restriction; the Noctua NF-A14x25 G2 (91.6 CFM free air, 2.56 mmH2O)</text>
+<text x="36" y="484" font-size="12">was chosen over the 200 mm NF-A20 (1.08 mmH2O) for its pressure. The 130 mm hole exposes about 86% of the open</text>
+<text x="36" y="500" font-size="12">slot area.</text>
+<text x="36" y="516" font-size="12">No internal shunt and no real seal: the nyacom face sits on thin 3 mm bumper pads against the inside of the</text>
+<text x="36" y="532" font-size="12">panel, so the pull fan draws air out of the whole enclosure (case air, PSU heat) through the slots and the</text>
+<text x="36" y="548" font-size="12">gaps, and make-up air leaks in through windows A and B. Dark pads under the case are the 3 mm bumpers; hold-</text>
+<text x="36" y="564" font-size="12">down brackets sit on the long sides, out of this plane.</text>
+<text x="36" y="580" font-size="12">Inside the base: 128 mm of 144 mm. Cable clearance: 80 mm at the I/O end, 95 mm at the PSU/AC end (Apache</text>
+<text x="36" y="596" font-size="12">5800). Outside the panel: fan 25 + guard 4 + hood 60 = about 89 mm; the hood's outlets face away from window A.</text>
+</svg>

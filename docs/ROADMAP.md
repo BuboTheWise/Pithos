@@ -10,7 +10,15 @@ Status: **pre-alpha / planning.** The milestones are ordered by dependency. Date
 | **M3** | **N.O.M.A.D. integration** | Still the stock installer: automated content-disk setup, remote-Ollama configuration, LAN-only firewall, embeddings pre-pulled, offline content pre-seeding. A Vulkan path for N.O.M.A.D.'s own container is proposed **upstream**. | A fresh box reaches a working N.O.M.A.D. + AI chat with no manual web-UI steps [UNVERIFIED that N.O.M.A.D. settings can be scripted] |
 | **M4** | **Cluster** | llama.cpp Vulkan+RPC build, `pithos-cluster.target`, cluster network on the NETGEAR switch, head/worker roles | 2-3 boxes serve a model that one box can't fit; results documented honestly |
 | **M5** | **Image builder** | Debian live-build image with layers 1-3, first-boot wizard, offline package cache | Flash USB → working box with no internet |
-| **M6** | **Multi-distro** | Adopt **[nomad-unchained](https://github.com/BuboTheWise/nomad-unchained)** (BuboTheWise) for N.O.M.A.D. on non-Debian bases; package lists per distro family; CI matrix. Push changes upstream to N.O.M.A.D. wherever upstream will accept them. | At least one non-Debian family (e.g. Fedora or Arch) passes the M1 checklist |
+| **M6** | **Multi-distro** | Package lists per distro family; CI matrix. Push changes upstream to N.O.M.A.D. wherever upstream will accept them. | At least one non-Debian family (e.g. Fedora or Arch) passes the M1 checklist |
+
+## Hardware testing
+
+|  | Item | Notes | Status |
+|---|---|---|---|
+| [#22](https://github.com/BuboTheWise/Pithos/issues/22) | `[ ]` Determine nyacom case cover compatibility — neo vs classic | `[ ]` | **Open** |
+| [#23](https://github.com/BuboTheWise/Pithos/issues/23) | `[ ]` Build and test the single-unit closed-case cooling | `[ ]` | **Open** |
+| [#24](https://github.com/BuboTheWise/Pithos/issues/24) | `[ ]` Benchmark the default 1G direct cluster interlink (two units) | `[ ]` | **Open** |
 
 ## Principles for every milestone
 

@@ -4,7 +4,7 @@ This is the **Milestone 1** reference path:
 
 > **vanilla Debian 13 + trixie-backports + host-native Vulkan Ollama + the stock upstream Project N.O.M.A.D. installer, pointed at the host Ollama.**
 
-Pithos M1 doesn't modify N.O.M.A.D. or use a fork. Fork-based multi-distro support (nomad-unchained) is planned for [M6](ROADMAP.md).
+
 
 Legend: **[UNVERIFIED]** = not yet confirmed on a BC-250 running this exact stack. **[EST]** = estimate. Versions were checked on 2026-11-03.
 

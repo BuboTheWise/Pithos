@@ -20,6 +20,5 @@ Issues are drafted here first and will be filed once the GitHub repo exists. Eac
 | 14 | M4 | Cluster benchmark: 1 vs 2 vs 3 boxes | Measure tokens/s and maximum model size, and document capacity versus speed honestly. | hardware |
 | 15 | M5 | `pithos-archive`: fetch, hash and record model provenance | Fetch to `archive/models/...` with README, LICENSE, SOURCE.txt and SHA256SUMS. Add a verify command. | good first issue |
 | 16 | M5 | live-build image prototype | Minimal trixie image with backports, governor and Ollama preinstalled. | |
-| 17 | M6 | Adopt nomad-unchained for non-Debian bases | Integrate [BuboTheWise/nomad-unchained](https://github.com/BuboTheWise/nomad-unchained) behind a distro check. Debian keeps the stock installer. | upstream |
-| 18 | M6 | Per-distro package map and CI matrix | Map Debian/Fedora/Arch package names for layers 1-3, and run container-based install tests. | |
+| 17 | M6 | Per-distro package map and CI matrix | Map Debian/Fedora/Arch package names for layers 1-3, and run container-based install tests. | upstream |
 | 19 | M4 | Optional cluster mode: 27B Q4/Q5 at full 65k for Hermes, every box stays solo-capable | See [PROPOSALS/optional-clustering-for-hermes-65k-and-single-box-baseline.md](PROPOSALS/optional-clustering-for-hermes-65k-and-single-box-baseline.md). Cluster head serves Qwen3.8-27B Q4_K_M/Q5_K_M at full 65k via llama.cpp RPC (item 13); `pithos-mode` (M2) returns any box to full solo. Success: quality uplift over 9B+ULTRA with honest capacity-vs-speed metrics (item 14). | hardware |

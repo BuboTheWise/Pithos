@@ -56,7 +56,7 @@ All of this is specific to the hardware and owned by Pithos. Where community pro
   2. runs the upstream `install_nomad.sh`;
   3. sets N.O.M.A.D.'s AI Assistant **remote Ollama URL** to `http://<LAN IP>:11434`, so N.O.M.A.D. stops its own `nomad_ollama` container.
 - **N.O.M.A.D. has no authentication**, so Pithos keeps it on the LAN.
-- **M6 (multi-distro):** adopt **[nomad-unchained](https://github.com/BuboTheWise/nomad-unchained)** (BuboTheWise's fork with apt/dnf/pacman support) for non-Debian bases, while working to get those changes merged upstream. Pithos should never need its own N.O.M.A.D. fork.
+- **Multi-distro work:** adapt N.O.M.A.D. installation for non-Debian bases where upstream will accept changes, rather than maintaining a fork. Pithos should never need its own N.O.M.A.D. fork.
 
 ```
  browser ──► N.O.M.A.D. (Docker, :8080) ──► host Ollama (:11434, Vulkan) ──► BC-250 GPU

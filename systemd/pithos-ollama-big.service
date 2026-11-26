@@ -1,12 +1,13 @@
 [Unit]
 Description=Pithos Big Model Ollama Service
 Documentation=file:///usr/share/doc/pithos/README.md
-After=network-online.target pithos-server.target
-Requires=pithos-server.target
+After=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/ollama serve llama3.2:1b-instruct-q4_0
+ExecStart=/usr/local/bin/ollama serve
+Environment=OLLAMA_LLM_LIBRARY=llama-vulkan
+Environment=OLLAMA_GPU_ARCH=auto
 WorkingDirectory=/opt/project-nomad/storage
 Restart=on-failure
 RestartSec=10
@@ -15,4 +16,4 @@ KillSignal=SIGINT
 TimeoutStopSec=60
 
 [Install]
-WantedBy=pithos-server.target multi-user.target
+WantedBy=pithos-server.target

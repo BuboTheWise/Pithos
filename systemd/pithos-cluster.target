@@ -1,8 +1,14 @@
 [Unit]
 Description=Pithos Cluster Mode Target
 Documentation=file:///usr/share/doc/pithos/README.md
-After=network-online.target pithos-ollama-big.service
-Conflicts=pithos-server.target graphical.target
+Wants=network-online.target
+After=network-online.target
+# Cluster mode stops Ollama to free GPU memory (CLI-SPEC modes table).
+Conflicts=pithos-server.target graphical.target pithos-ollama-big.service
+# Forward references to the llama.cpp cluster units (head llama-server +
+# ggml-rpc worker, issue #15): referenced per the #10 card; systemd
+# tolerates units that don't exist until they are shipped.
+Wants=pithos-llama-server.service pithos-ggml-rpc-worker.service
 
 [Install]
 WantedBy=multi-user.target

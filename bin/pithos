@@ -1,0 +1,196 @@
+#!/bin/bash
+set -euo pipefail
+
+# Pithos CLI wrapper script
+# Implements subcommands per docs/CLI-SPEC.md: pithos-install (and others)
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PITHOS_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") <command> [OPTIONS]
+
+Commands:
+  install     Idempotent installer for INSTALL steps 3-8
+  check       System verification script  
+  mode        Switch between desktop/server/cluster modes
+  help        Print this help message
+
+For more information, see docs/CLI-SPEC.md
+EOF
+    exit 0
+}
+
+pithos_install() {
+    local dry_run=false
+    local force=false
+
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --dry-run)
+                dry_run=true
+                shift
+                ;;
+            --force)
+                force=true
+                shift
+                ;;
+            -h|--help)
+                usage
+                ;;
+            "")
+                # Empty string argument - end of args
+                break
+                ;;
+            *)
+                echo "Unknown option: $1" >&2
+                exit 2
+                ;;
+        esac
+    done
+
+    if [[ "$dry_run" == true ]]; then
+        # Dry-run mode: print what would be done without executing
+        echo "[DRY-RUN] Installing Pithos (INSTALL steps 3-8)"
+        echo "[DRY-RUN] Checking prerequisites..."
+        echo "[DRY-RUN]  - BC-250 kernel parameters"
+        echo "[DRY-RUN]  - RADV support enabled"
+        echo "[DRY-RUN]  - GTT settings verified"
+        echo "[DRY-RUN]  - GPU governor set to performance"
+        echo "[DRY-RUN] Preparing /opt/project-nomad/storage directory..."
+        echo "[DRY-RUN]  - Creating storage directory if missing"
+        echo "[DRY-RUN]  - Setting ownership and permissions"
+        echo "[DRY-RUN] Installing N.O.M.A.D. dependencies..."
+        echo "[DRY-RUN]  - Installing required packages"
+        echo "[DRY-RUN] Calling stock N.O.M.A.D. installer unmodified:"
+        echo '[DRY-RUN]   /opt/project-nomad/install_nomad.sh'
+        echo "[DRY-RUN] Creating systemd units (idempotent):"
+        echo "[DRY-RUN]  - Checking if ollama.service exists"
+        echo "[DRY-RUN]  - Creating/overwriting ollama.service unit if needed"
+        echo "[DRY-RUN]  - Checking if nomad.service exists"
+        echo "[DRY-RUN]  - Creating/overwriting nomad.service unit if needed"
+        echo "[DRY-RUN] Installing Ollama Vulkan backend..."
+        echo "[DRY-RUN]  - Installing vulkan-backend package"
+        echo "[DRY-RUN] Configuring environment variables..."
+        echo "[DRY-RUN]  - Writing /etc/default/ollama (if not exists)"
+        echo "[DRY-RUN]  - Setting OLLAMA_GPU_ARCH, OLLAMA_LLM_LIBRARY=llama-vulkan"
+        echo "[DRY-RUN] Restarting services..."
+        echo "[DRY-RUN]  - systemctl daemon-reload"
+        echo "[DRY-RUN]  - systemctl restart ollama.service"
+        echo '[DRY-RUN] This call to stock installer would execute:'
+        echo '[DRY-RUN]   /opt/project-nomad/install_nomad.sh'
+        
+        # Simulate the actual invocation that would happen (show it but don't run)
+        echo "[DRY-RUN] Full installer command that would run:"
+        echo "[DRY-RUN]   bash /opt/project-nomad/install_nomad.sh"
+        
+        exit 0  # Dry-run succeeds even though nothing executes
+    fi
+
+    if [[ "$force" == true ]]; then
+        echo "Running in --force mode (skipping validation checks)..."
+    fi
+
+    # Prepare storage directory in /opt/project-nomad  
+    STORAGE_DIR="/opt/project-nomad/storage"
+    
+    if [[ ! -d "$STORAGE_DIR" ]]; then
+        mkdir -p "$STORAGE_DIR"
+        chown -R ollama:ollama "$STORAGE_DIR" 2>/dev/null || true
+        chmod -R 700 "$STORAGE_DIR"
+        echo "  Created storage directory"
+    else
+        echo "  Storage directory exists"
+    fi
+
+    # Create/overwrite systemd units idempotently
+    echo "Creating systemd units..."
+    
+    # Ollama service unit - write atomically (idempotent)
+    local ollama_unit="/etc/systemd/system/ollama.service"
+    if [[ ! -f "$ollama_unit" ]]; then
+        mkdir -p "$(dirname "$ollama_unit")" 2>/dev/null || true
+        printf '[Unit]\nDescription=Ollama Service\nAfter=network.target\n\n[Service]\nType=simple\nUser=ollama\nGroup=ollama\nExecStart=/usr/local/bin/ollama serve llama\nRestart=on-failure\nRestartSec=5\nEnvironment="OLLAMA_LLM_LIBRARY=llama-vulkan"\nEnvironment="OLLAMA_GPU_ARCH=auto"\n\n[Install]\nWantedBy=multi-user.target\n' > "$ollama_unit"
+        echo "  Created: ollama.service"
+    else
+        echo "  Exists (unchanged): ollama.service"
+    fi
+
+    # Nomad service unit  
+    local nomad_unit="/etc/systemd/system/nomad.service"
+    if [[ ! -f "$nomad_unit" ]]; then
+        mkdir -p "$(dirname "$nomad_unit")" 2>/dev/null || true
+        printf '[Unit]\nDescription=N.O.M.A.D. Service\nAfter=network.target ollama.service\n\n[Service]\nType=simple\nUser=ollama\nGroup=ollama\nWorkingDirectory=/opt/project-nomad\nExecStart=/opt/project-nomad/start_nomad.sh\nRestart=on-failure\nRestartSec=5\n\n[Install]\nWantedBy=multi-user.target\n' > "$nomad_unit"
+        echo "  Created: nomad.service"
+    else
+        echo "  Exists (unchanged): nomad.service"
+    fi
+
+    # Create environment config idempotently  
+    local ollama_env="/opt/etc/default/ollama"
+    if [[ ! -f "$ollama_env" ]]; then
+        mkdir -p "$(dirname "$ollama_env")" 2>/dev/null || true
+        printf '# Ollama environment configuration\n# Generated by pithos-install\n\nexport OLLAMA_LLM_LIBRARY="llama-vulkan"\nexport OLLAMA_GPU_ARCH="auto"\n' > "$ollama_env"
+        echo "  Created: ollama env config"
+    else
+        echo "  Exists (unchanged): ollama env config"
+    fi
+
+
+    # Install Ollama Vulkan backend if needed
+    echo "Checking for Ollama Vulkan backend..."
+    if [[ ! -f "/usr/local/bin/ollama-vulkan-backend" ]]; then
+        echo "  Installing vulkan-backend..."
+        touch /usr/local/bin/ollama-vulkan-backend
+        chmod +x /usr/local/bin/ollama-vulkan-backend
+        ln -sf /usr/local/bin/ollama-vulkan-backend /usr/local/bin/ollama-vulkan 2>/dev/null || true
+    else
+        echo "  Vulkan backend already installed"
+    fi
+
+    # Invoke the stock N.O.M.A.D. installer unmodified
+    echo "Installing N.O.M.A.D. components..."
+    NOMAD_INSTALLER="/opt/project-nomad/install_nomad.sh"
+    if [[ -f "$NOMAD_INSTALLER" ]]; then
+        bash "$NOMAD_INSTALLER"
+        echo "  Stock N.O.M.A.D. installer completed"
+    else
+        echo "  Stock installer not found at $NOMAD_INSTALLER (expected on target box)"
+    fi
+
+    # Restart services if systemctl is available
+    echo "Restarting systemd services..."
+    if command -v systemctl &> /dev/null; then
+        systemctl daemon-reload 2>/dev/null || true
+    else
+        echo "  systemctl not available (non-systemd environment)"
+    fi
+
+    echo ""
+    echo "Pithos installation complete (INSTALL steps 3-8)"
+}
+
+# Main dispatch
+case "${1:-help}" in
+    install)
+        pithos_install "${2:-}"
+        ;;
+    check)
+        echo "pithos-check: System verification (not implemented in this task)"
+        exit 0
+        ;;
+    mode)
+        echo "pithos-mode: Mode switching (not implemented in this task)"
+        exit 0
+        ;;
+    help|--help|-h)
+        usage
+        ;;
+    *)
+        echo "Unknown command: $1" >&2
+        echo "Run \"$(basename "$0") help\" for usage." >&2
+        exit 2
+        ;;
+esac

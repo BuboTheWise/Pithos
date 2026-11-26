@@ -14,7 +14,7 @@
 
 | Role | Model | Quant | File size | Pull |
 |---|---|---|---|---|
-| **Fast pick** (server; also desktop if memory allows) | [mradermacher/Qwen3.6-35B-A3B-uncensored-heretic-i1-GGUF](https://huggingface.co/mradermacher/Qwen3.6-35B-A3B-uncensored-heretic-i1-GGUF) (base: llmfan46/Qwen3.6-35B-A3B-uncensored-heretic) | i1-IQ2_M | 11.66 GB | `ollama pull hf.co/mradermacher/Qwen3.6-35B-A3B-uncensored-heretic-i1-GGUF:i1-IQ2_M` |
+|| **Permanent pithos-chat baseline** (on-box default) | [qwen3.5:9b](https://ollama.com/library/qwen3.5:9b) | q4_0 | ~5 GB | `ollama pull qwen3.5:9b` *(set as permanent pithos-chat baseline, 2026-11-26)* |
 | **Quality pick** (server) | [orcarouter/Qwen3.8-27B-Uncensored-GGUF](https://huggingface.co/orcarouter/Qwen3.8-27B-Uncensored-GGUF) (base: Qwen/Qwen3.8-27B) | IQ3_XXS | 11.64 GB | `ollama pull hf.co/orcarouter/Qwen3.8-27B-Uncensored-GGUF:IQ3_XXS` (**gated**, see below) |
 | **Embeddings** (required by N.O.M.A.D.) | nomic-embed-text | v1.5 | small | Pulled by N.O.M.A.D. through the host Ollama |
 | **Desktop small model** | **TBD**: something small enough to leave room for XFCE and a browser | | | (open decision) |

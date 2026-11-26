@@ -82,6 +82,28 @@ Pithos boxes serve any device on the LAN through a browser (N.O.M.A.D.) or the O
 - **Laptop (e.g. Framework):** a client, or a mid-tier with its own models.
 - **Desktop with RTX 3090 (24 GB):** a high tier for larger or higher-quality quantizations.
 
+## **Status of draft PR #21**
+
+This document superseded the design in [draft PR #21](https://github.com/BuboTheWise/Pithos/pull/21), which is now marked stale. The following facts override that draft:
+- Case runs closed. All I/O through external dust-protected ports.
+- Interior storage for cables, an Xbox Series controller (bay about 160 x 110 x 65 mm), and accessories.
+- NexDock 360 stays outside the case.
+
+### Open hardware decisions in PR #21
+
+| # | Item | Linked issue |
+|---|---|---|
+| 1 | **Hermes cluster endpoint**: `:8081` (llama.cpp RPC) vs `:11434` (Ollama native) — affects systemd targets, firewall rules, TLS config | [#30](https://github.com/BuboTheWise/Pithos/issues/30) (blocked) |
+| 2 | **Neo vs classic nyacom cover**: which internal cover variant for GPU VRAM cooling pad mounting and airflow path integrity? | [#22](https://github.com/BuboTheWise/Pithos/issues/22) |
+| 3 | **Apache 5800 fit verification**: confirm BC-250 + Apevia PSU + thermal pads physically fits with cable clearance margins | [#27](https://github.com/BuboTheWise/Pithos/issues/27) |
+| 4 | **1G cluster prefill performance**: is default 1G direct interlink acceptable for prompt prefill, or does it create unacceptable latency? | [#24](https://github.com/BuboTheWise/Pithos/issues/24) |
+| 5 | **Switch choice for 3+ units**: NETGEAR Plus gigabit switch vs upgrade to a 5GBASE-T model when clustering three or more boxes | [#25](https://github.com/BuboTheWise/Pithos/issues/25) |
+| 6 | **PSU spare strategy**: second Apevia PSU as hot-spare in shared kit, or single-PSU adequate for briefcase transport? | [#26](https://github.com/BuboTheWise/Pithos/issues/26) |
+| 7 | **Apache 4800 vs 5800**: the HARDWARE.md references Apache 4800 but this PR targets 5800 — verify which case to standardize on | [#27](https://github.com/BuboTheWise/Pithos/issues/27) |
+| 8 | **Cable clearance at I/O and PSU ends**: measured values (80 mm / 95 mm for 5800; 60 mm / 55 mm for 4800) need on-prototype verification | [#28](https://github.com/BuboTheWise/Pithos/issues/28) |
+| 9 | **Mechanical protection**: hold-down brackets, bumper pads, external deflector hood design and drop-test protocol | [#29](https://github.com/BuboTheWise/Pithos/issues/29) |
+| 10 | **Safety alerts**: pull-fan tachometer monitoring and over-temperature alert system (optional) | [#31](https://github.com/BuboTheWise/Pithos/issues/31) |
+
 ## Display (desktop mode)
 
 A NexDock works as a portable screen and keyboard. Owner notes: use an *active* DP-to-HDMI adapter (or passive, at about 1080p/1440p) into the NexDock's mini-HDMI, plus USB for the keyboard and touchpad. Power the NexDock from its own USB-C PD charger. Plain DP-to-USB-C into the NexDock doesn't work. **[UNVERIFIED across NexDock models.]**

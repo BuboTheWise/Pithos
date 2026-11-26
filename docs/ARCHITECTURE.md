@@ -34,7 +34,7 @@ Everything needed to make the GPU usable:
 | Piece | Why |
 |---|---|
 | Backports kernel 7.2.x + Mesa 26.1.x + firmware | Stock trixie Mesa (25.0.7) can't drive gfx1013 with RADV |
-| Kernel params `amdgpu.sg_display=0 ttm.pages_limit=4194304 ttm.page_pool_size=4194304` | Display stability; 16 GiB GTT for the GPU |
+| Kernel params `amdgpu.sg_display=0 ttm.pages_limit=8162647 ttm.page_pool_size=8162647` | Display stability; 16 GiB GTT for the GPU. **GTT/UMA on the BC-250**: config source: kernel cmdline `ttm.pages_limit=` / `amdgpu.gttsize=` (Ki) and/or `/etc/modprobe.d/amdgpu.conf`; current state: driver default (`pages_limit`=8162647, `page_pool_size`=0) — verified on primary box 2026-11-26; recommended override below if you want to set explicit values — "recommended, not yet verified on a running box."
 | modprobe.d + tmpfiles.d ttm settings, `update-initramfs` | Makes the GTT size stick (tmpfiles.d wins last) |
 | 16 GiB swapfile | Headroom when loading models |
 | `cyan-skillfish-governor-smu` (.deb) | Without it the GPU is stuck at 1500 MHz |

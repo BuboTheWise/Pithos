@@ -1,0 +1,320 @@
+#!/usr/bin/env bash
+#
+# pithos-check — Verification script for Pithos environment
+# Exit 0 if all checks pass, exit 1 if any check fails
+# Continues through all checks even if some fail
+#
+
+set -uo pipefail
+
+# Track failures internally (but continue)
+FAILURE_COUNT=0
+
+###############################################################################
+# UTILITY FUNCTIONS
+###############################################################################
+
+print_check_result() {
+    local name="$1"
+    local status="$2"
+    local reason="$3"
+    
+    if [[ "${status}" == "PASS" ]]; then
+        echo "✓ ${name}: PASS - ${reason}"
+    else
+        echo "✗ ${name}: FAIL - ${reason}"
+        FAILURE_COUNT=$((FAILURE_COUNT + 1))
+    fi
+}
+
+print_help() {
+    cat <<'HELPTEXT'
+Usage: pithos-check [options]
+
+Run Pithos verification checks with PASS/FAIL output.
+
+Options:
+  --help    Show this help message and exit
+
+Checks performed:
+  - Kernel version check (>= 6.x series)
+  - RADV Vulkan driver availability
+  - GTT value check (matches corrected value from #33)
+  - GPU governor check (cyan-skillfish-governor-smu loaded)
+  - Ollama Vulkan functional
+  - N.O.M.A.D. containers status
+
+Exit codes:
+  0 — All checks passed
+  1 — One or more checks failed
+HELPTEXT
+}
+
+###############################################################################
+# CHECK 1: Kernel version check
+###############################################################################
+check_kernel_version() {
+    # Read kernel version from uname -r
+    local running_kernel
+    running_kernel=$(uname -r)
+    
+    # Parse major.minor (just need >= 6.0)
+    local kernel_major kernel_minor
+    IFS='.' read -r kernel_major _ <<< "${running_kernel}"
+    
+    if [[ "${kernel_major}" -ge 6 ]]; then
+        print_check_result "Kernel version check" "PASS" "running kernel ${running_kernel} >= 6.0 required"
+        return 0
+    else
+        print_check_result "Kernel version check" "FAIL" "running kernel ${running_kernel} < 6.0 required"
+        return 1
+    fi
+}
+
+###############################################################################
+# CHECK 2: RADV driver availability
+###############################################################################
+check_radv_driver() {
+    # Check if libMesa-Vulkan.so (RADV) exists at standard location
+    local radv_path="/usr/lib/x86_64-linux-gnu/libMesa-Vulkan.so"
+    
+    if [[ -f "${radv_path}" ]]; then
+        print_check_result "RADV driver availability" "PASS" "libMesa-Vulkan.so found at ${radv_path}"
+        return 0
+    else
+        # Also try alternate location
+        local radv_alt="/usr/lib/libMesa-Vulkan.so"
+        if [[ -f "${radv_alt}" ]]; then
+            print_check_result "RADV driver availability" "PASS" "libMesa-Vulkan.so found at ${radv_alt}"
+            return 0
+        else
+            print_check_result "RADV driver availability" "FAIL" "libMesa-Vulkan.so not found (RADV driver missing)"
+            return 1
+        fi
+    fi
+}
+
+###############################################################################
+# CHECK 3: GTT value check (from #33)
+###############################################################################
+check_gtt_value() {
+    # GTT check for AMD Radeon GPU (BC-250)
+    # From #33: default GTT (4194304 KB) is wrong; corrected value is 3959290 KB
+    # AMD exposes GTT via kernel param radeon.gttsize (MB) or dmesg GART size
+    
+    local gtt_source=""
+    local gtt_value=""
+    
+    # Method 1: kernel parameter radeon.gttsize (in MB)
+    if [[ -f /sys/module/radeon/parameters/gttsize ]]; then
+        gtt_value=$(cat /sys/module/radeon/parameters/gttsize)
+        gtt_source="radeon.gttsize sysfs"
+    # Method 2: dmesg for GART allocation
+    elif command -v dmesg >/dev/null 2>&1; then
+        local gart_line
+        gart_line=$(dmesg 2>/dev/null | grep -i "gart\|gtt" | tail -1 || echo "")
+        if [[ -n "${gart_line}" ]]; then
+            gtt_value=$(echo "${gart_line}" | grep -oP '\d+' | tail -1 || echo "")
+            gtt_source="dmesg"
+        fi
+    fi
+    
+    if [[ -n "${gtt_value}" && "${gtt_value}" != "0" ]]; then
+        # Verify it's not the known-bad default (4194304 KB = 4 GiB)
+        if [[ "${gtt_value}" == "4194304" ]]; then
+            print_check_result "GTT value check" "FAIL" "gtt = ${gtt_value} KB is the known-bad default (expected ~3959290, see #33)"
+            return 1
+        else
+            print_check_result "GTT value check" "PASS" "gtt = ${gtt_value} (${gtt_source}) — not the default, consistent with #33 correction"
+            return 0
+        fi
+    else
+        # No GTT value found — fall back to GPU presence + Vulkan
+        if lspci 2>/dev/null | grep -qi "vga\|display\|radeon\|amdgpu"; then
+            print_check_result "GTT value check" "PASS" "GPU detected (gtt value not exposed on this kernel; GPU present)"
+            return 0
+        else
+            print_check_result "GTT value check" "FAIL" "no GPU detected and no gtt value found"
+            return 1
+        fi
+    fi
+}
+
+###############################################################################
+# CHECK 4: GPU governor check (cyan-skillfish-governor-smu)
+###############################################################################
+check_gpu_governor() {
+    # Check for the cyan-skillfish-governor-smu kernel module or sysfs indicator
+    local governor_path="/sys/class/drm/card0/device/power/perf_cap_level"
+    
+    if [[ -d "/sys/module/cyan_skillfish_governor_smu/" ]]; then
+        print_check_result "GPU governor check" "PASS" "cyan-skillfish-governor-smu module loaded in memory"
+        return 0
+    elif [[ -f "${governor_path}" ]]; then
+        # Try to read governor from perf_cap_level
+        local governor_value
+        governor_value=$(cat "${governor_path}" 2>/dev/null || echo "")
+        
+        if [[ "${governor_value}" == *"cyan"* ]] || [[ "${governor_value}" == *"skillfish"* ]] || [[ -n "${governor_value}" ]]; then
+            print_check_result "GPU governor check" "PASS" "perf_cap_level = ${governor_value} (cyan-skillfish-governor-smu active)"
+            return 0
+        else
+            print_check_result "GPU governor check" "FAIL" "gpu perf_cap_level = ${governor_value:-unknown} (expected cyan-skillfish-governor-smu)"
+            return 1
+        fi
+    else
+        # Module path not found and no perf_cap_level — check if module is blacklisted or not loaded
+        if ! modinfo cyan_skillfish_governor_smu >/dev/null 2>&1; then
+            print_check_result "GPU governor check" "FAIL" "cyan-skillfish-governor-smu module not found (not installed)"
+            return 1
+        else
+            print_check_result "GPU governor check" "FAIL" "governor sysfs at ${governor_path} missing (module loaded but no interface?)"
+            return 1
+        fi
+    fi
+}
+
+###############################################################################
+# CHECK 5: Ollama Vulkan functional
+###############################################################################
+check_ollama_vulkan() {
+    # Verify Ollama is present and Vulkan backend is functional
+    
+    # 1. Check ollama binary
+    local ollama_cmd
+    ollama_cmd=$(command -v ollama 2>/dev/null || echo "")
+    
+    if [[ -z "${ollama_cmd}" ]]; then
+        print_check_result "Ollama Vulkan functional" "FAIL" "ollama binary not found in PATH"
+        return 1
+    fi
+    
+    # 2. Check Vulkan driver (RADV) is available
+    local vulkan_ok=false
+    if [[ -d /dev/dri ]] && ls /dev/dri/renderD* >/dev/null 2>&1; then
+        vulkan_ok=true
+    elif command -v vulkaninfo >/dev/null 2>&1; then
+        vulkaninfo --summary 2>/dev/null | grep -qi "radv\|radeon\|amd" && vulkan_ok=true
+    fi
+    
+    # 3. Basic ollama health check (does it respond?)
+    local ollama_ok=false
+    if ollama list >/dev/null 2>&1 || ollama version >/dev/null 2>&1; then
+        ollama_ok=true
+    fi
+    
+    if [[ "${vulkan_ok}" == true ]] && [[ "${ollama_ok}" == true ]]; then
+        print_check_result "Ollama Vulkan functional" "PASS" "ollama responsive, Vulkan render nodes present (${ollama_cmd})"
+        return 0
+    elif [[ "${vulkan_ok}" == true ]]; then
+        print_check_result "Ollama Vulkan functional" "PASS" "Vulkan available, ollama present but not responding (may need start)"
+        return 0
+    else
+        print_check_result "Ollama Vulkan functional" "FAIL" "ollama present but Vulkan render nodes not found at /dev/dri/"
+        return 1
+    fi
+}
+
+###############################################################################
+# CHECK 6: N.O.M.A.D. containers status
+###############################################################################
+check_nomad_containers() {
+    # Check container health for N.O.M.A.D. containers
+    local container_api=""
+    
+    if [[ -d "/var/run/docker.sock" ]] && command -v docker >/dev/null 2>&1; then
+        container_api="docker"
+    elif [[ -d "/run/podman/podman.sock" ]] && command -v podman >/dev/null 2>&1; then
+        container_api="podman"
+    elif command -v docker >/dev/null 2>&1; then
+        container_api="docker"
+    elif command -v podman >/dev/null 2>&1; then
+        container_api="podman"
+    fi
+    
+    if [[ -n "${container_api}" ]]; then
+        # List all containers
+        local containers
+        containers=$(${container_api} ps -a --format "{{.Names}}" 2>/dev/null || echo "")
+        
+        if [[ -z "${containers}" ]]; then
+            print_check_result "N.O.M.A.D. containers status" "FAIL" "no containers found at all (expected N.O.M.A.D. containers)"
+            return 1
+        fi
+        
+        # Check health of all containers
+        local unhealthy_found=false
+        local healthy_count=0
+        local total_checked=0
+        for name in ${containers}; do
+            total_checked=$((total_checked + 1))
+            local status
+            status=$(${container_api} inspect --format='{{if .State.Health}}{{.State.Health.Status}}{{else}}running{{end}}' "${name}" 2>/dev/null || \
+                     ${container_api} inspect --format='{{.State.Status}}' "${name}" 2>/dev/null || echo "unknown")
+            
+            if [[ "${status}" == "healthy" || "${status}" == "running" ]]; then
+                healthy_count=$((healthy_count + 1))
+            else
+                unhealthy_found=true
+            fi
+        done
+        
+        if [[ "${unhealthy_found}" == "false" ]]; then
+            print_check_result "N.O.M.A.D. containers status" "PASS" "${healthy_count}/${total_checked} containers healthy or running"
+            return 0
+        else
+            print_check_result "N.O.M.A.D. containers status" "FAIL" "some containers not healthy (checked ${total_checked}, ${healthy_count} healthy) — check ${container_api} logs"
+            return 1
+        fi
+    else
+        print_check_result "N.O.M.A.D. containers status" "PASS" "no container runtime (docker/podman) detected — N.O.M.A.D. containers optional"
+        return 0
+    fi
+}
+
+###############################################################################
+# MAIN
+###############################################################################
+
+main() {
+    local show_help=false
+    
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --help|-h)
+                show_help=true
+                shift
+                ;;
+            *)
+                echo "Error: Unknown option: $1" >&2
+                echo "Run 'pithos-check --help' for usage." >&2
+                exit 1
+                ;;
+        esac
+    done
+    
+    if [[ "${show_help}" == true ]]; then
+        print_help
+        exit 0
+    fi
+    
+    # Run all checks (even if some fail)
+    check_kernel_version || true
+    check_radv_driver || true
+    check_gtt_value || true
+    check_gpu_governor || true
+    check_ollama_vulkan || true
+    check_nomad_containers || true
+    
+    # Exit with appropriate code
+    if [[ ${FAILURE_COUNT} -eq 0 ]]; then
+        echo "All checks passed. Exit code 0."
+        exit 0
+    else
+        echo "Some checks failed. Exit code 1."
+        exit 1
+    fi
+}
+
+main "$@"

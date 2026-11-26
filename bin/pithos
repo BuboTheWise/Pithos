@@ -179,103 +179,26 @@ pithos_install() {
 }
 
 pithos_check() {
-    local details=false
-
-    # Parse arguments
-    while [[ $# -gt 0 ]]; do
-        case "$1" in
-            --details)
-                details=true
-                shift
-                ;;
-            -h|--help)
-                usage
-                ;;
-            "")
-                break
-                ;;
-            *)
-                echo "Unknown option: $1" >&2
-                exit 2
-                ;;
-        esac
+    # Delegate to the standalone pithos-check (bin/pithos-check), which owns the
+    # verification logic and the non-zero-on-failure exit code required by #7.
+    # (The inline re-implementation was removed: it duplicated that logic with a
+    # weaker GTT check and exited 0 on FAIL.)
+    local checker="${SCRIPT_DIR}/pithos-check"
+    if [[ ! -e "$checker" ]]; then
+        echo "Error: pithos-check not found at $checker" >&2
+        exit 1
+    fi
+    # Filter out empty args (a bare 'pithos check' passes an empty ${2:-}).
+    local -a args=()
+    local a
+    for a in "$@"; do
+        [[ -n "$a" ]] && args+=("$a")
     done
-
-    echo "Checking Pithos system..."
-    echo ""
-
-    # Check kernel
-    local kernel=$(uname -r)
-    if [[ "$kernel" == *"trixie"* ]] || [[ "$kernel" == *"backports"* ]]; then
-        echo "[PASS] kernel — Debian 13 trixie-backports running ($kernel)"
+    if [[ -x "$checker" ]]; then
+        exec "$checker" ${args[@]+"${args[@]}"}
     else
-        echo "[FAIL] kernel — Not Debian 13 trixie-backports (running: $kernel)"
+        exec bash "$checker" ${args[@]+"${args[@]}"}
     fi
-
-    # Check RADV
-    if [[ -f "/dev/dri/radeon" ]]; then
-        echo "[PASS] radv — /dev/dri/radeon found; driver loaded"
-    else
-        echo "[FAIL] radv — /dev/dri/radeon not found"
-    fi
-
-    # Check GTT
-    if [[ -d "/sys/kernel/mm/drm/ttm" ]]; then
-        local pages_limit=$(cat /sys/kernel/mm/drm/ttm/mman/buddy_order 2>/dev/null || echo "unknown")
-        echo "[PASS] gtt — GTT settings verified (pages_order=$pages_limit)"
-    else
-        echo "[FAIL] gtt — DRM TTM not available"
-    fi
-
-    # Check governor
-    if [[ -f "/sys/devices/pci0000:00/0000:00:01.0/governor" ]]; then
-        local gov=$(cat /sys/devices/pci0000:00/0000:00:01.0/governor 2>/dev/null || echo "")
-        if [[ "$gov" == *"cyan"* ]] || [[ "$gov" == *"performance"* ]]; then
-            echo "[PASS] governor — $gov active"
-        else
-            echo "[FAIL] governor — Expected cyan-skillfish-governor-smu or performance (got: $gov)"
-        fi
-    else
-        echo "[WARN] governor — governor file not found, skipping check"
-    fi
-
-    # Check Ollama Vulkan
-    if command -v ollama &> /dev/null && [[ "$(systemctl is-active ollama 2>/dev/null || echo 'inactive')" == "active" ]]; then
-        local ollama_vulkan_flag=$(grep -i vulkan /proc/1/fd/ 2>/dev/null | head -1 || echo "")
-        if [[ "$ollama_vulkan_flag" != "" ]]; then
-            echo "[PASS] ollama-vulkan — Ollama running with Vulkan backend"
-        else
-            echo "[WARN] ollama-vulkan — Ollama running but Vulkan status unclear"
-        fi
-    else
-        echo "[FAIL] ollama-vulkan — Ollama not running or Vulkan backend not detected"
-    fi
-
-    # Check N.O.M.A.D. containers
-    if command -v systemctl &> /dev/null && [[ -d "/opt/project-nomad" ]]; then
-        local nomad_status=$(systemctl is-active nomad 2>/dev/null || echo "inactive")
-        if [[ "$nomad_status" == "active" ]]; then
-            echo "[PASS] nomad-containers — N.O.M.A.D. container running on port 8080"
-        else
-            echo "[FAIL] nomad-containers — N.O.M.A.D. container not running (status: $nomad_status)"
-        fi
-    else
-        echo "[WARN] nomad-containers — N.O.M.A.D. directory not found, skipping check"
-    fi
-
-    # Check vulkan driver if RADV passed
-    if [[ "$(uname -r)" == *"trixie"* ]] || [[ "$kernel" == *"backports"* ]]; then
-        if [[ "$kernel" == *"backports"* ]]; then
-            echo "[PASS] AMD-GTT — /dev/dri/radeon found on backports kernel"
-        else
-            echo "[WARN] AMD-GTT — Not on backports kernel, skipping GTT check"
-        fi
-    fi
-
-    echo ""
-    echo "========================================="
-    echo "SUMMARY: Check complete"
-    echo "========================================="
 }
 
 pithos_mode() {
@@ -342,17 +265,13 @@ EOF
         esac
     done
 
-    # Check root (required)
-    require_root
-
-    # Validate mode argument
+    # Validate the mode argument first (cheap, no root needed) so a bad mode
+    # is reported as "invalid mode" rather than "must be root".
     case "$mode" in
         desktop|server|cluster)
             ;;
         "")
-            echo "Error: No mode specified. Use 'desktop', 'server', or 'cluster'." >&2
-            echo ""
-            usage
+            echo "Error: No mode specified. Use: pithos mode <desktop|server|cluster> [--once]" >&2
             exit 1
             ;;
         *)
@@ -361,61 +280,60 @@ EOF
             ;;
     esac
 
-    # Define systemd target mapping
+    # Root is required before we touch GRUB / systemd.
+    require_root
+
+    # Map mode -> systemd target
     local target
     case "$mode" in
-        desktop)
-            target="graphical.target"
-            ;;
-        server)
-            target="pithos-server.target"
-            ;;
-        cluster)
-            target="pithos-cluster.target"
-            ;;
+        desktop) target="graphical.target" ;;
+        server)  target="pithos-server.target" ;;
+        cluster) target="pithos-cluster.target" ;;
     esac
 
-    # Check if target exists before proceeding
-    if ! systemctl list-units --type=target -a | grep -q "^${target}\."; then
+    # The target must already exist (created by the #10 systemd-targets task).
+    if ! systemctl list-units --type=target --all 2>/dev/null | grep -qE "^${target}([[:space:]]|$)"; then
         echo "Error: Systemd target '$target' does not exist." >&2
-        echo ""
-        echo "Required: The systemd targets must be created by a prior task (e.g., #10)." >&2
+        echo "Required: the systemd targets must be created first (Pithos #10)." >&2
         echo "Available targets:" >&2
-        systemctl list-units --type=target -a 2>/dev/null | grep "^.*\.target" | awk '{print "  " $2}' || true
+        systemctl list-units --type=target --all 2>/dev/null | awk '{print "  " $1}' || true
         exit 1
     fi
 
-    # Set GRUB boot entry and switch target
-    if [[ "$once" == true ]]; then
-        # One-shot mode: use grub-reboot for single-boot persistence
-        echo "Setting one-shot mode '$mode' (target: $target) via grub-reboot..."
-        if command -v grub-reboot &> /dev/null; then
-            grub-reboot "$target"
-            echo "  GRUB entry set. Rebooting now with systemctl isolate..."
-            # Note: This will reboot immediately, so systemctl isolate is part of the reboot flow
-            # We use grub-reboot which queues a reboot with new default, effectively isolating to target
-            systemctl poweroff 2>/dev/null || true
+    # Queue the boot entry (spec: uses grub-reboot). Only meaningful if the
+    # #10 task also installs a matching GRUB entry for this target.
+    if command -v grub-reboot &> /dev/null; then
+        if grub-reboot "$target"; then
+            echo "GRUB entry for '$target' queued for next boot."
         else
-            echo "Error: grub-reboot command not found." >&2
-            echo "This command requires GRUB on boot media. Cannot proceed in one-shot mode." >&2
-            exit 1
+            echo "Warning: grub-reboot '$target' failed (entry may not exist yet)." >&2
         fi
     else
-        # Persistent mode: set grub-reboot without immediate reboot flag,
-        # and isolate to target if systemctl available
-        echo "Setting persistent mode '$mode' (target: $target)..."
-        
-        # Use grub-reboot to queue the next boot with this target as default
-        grub-reboot "$target"
-        
-        echo "  GRUB entry queued for next boot."
-        
-        # Optionally switch immediately if requested or if running in server/cluster mode
-        # For safety, don't auto-isolate - let user decide via --once if immediate reboot wanted
-        echo ""
-        echo "Mode set to '$mode'. System will use this on next reboot (grub-reboot queued)."
-        echo "To switch immediately: run '$(basename "$0") mode $mode --once' or manually:" >&2
-        echo "  systemctl isolate $target"
+        echo "Warning: grub-reboot not found; next-boot entry not queued." >&2
+    fi
+
+    # Switch the active target now (spec: systemctl isolate). This is the
+    # mechanism that actually takes effect; it is the acceptance-criteria
+    # requirement for both --once and persistent paths.
+    if ! systemctl isolate "$target"; then
+        echo "Error: 'systemctl isolate $target' failed." >&2
+        exit 1
+    fi
+    echo "Active target switched to '$target'."
+
+    if [[ "$once" == true ]]; then
+        # One-shot: boot this target once, then reset to default. Reboot (not
+        # poweroff) so the queued one-shot GRUB entry actually takes effect.
+        echo "One-shot mode: rebooting now so the next boot uses '$target'."
+        systemctl reboot 2>/dev/null || true
+    else
+        # Persistent: keep this as the default so it survives reboots even if
+        # the one-shot GRUB entry resets.
+        if command -v systemctl &> /dev/null; then
+            systemctl set-default "$target" 2>/dev/null \
+                && echo "Default target set to '$target' (persists across reboots)." \
+                || echo "Note: could not set-default '$target'; it will not persist on its own." >&2
+        fi
     fi
 
     exit 0

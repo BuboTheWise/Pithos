@@ -1,0 +1,18 @@
+[Unit]
+Description=Pithos Big Model Ollama Service
+Documentation=file:///usr/share/doc/pithos/README.md
+After=network-online.target pithos-server.target
+Requires=pithos-server.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/ollama serve llama3.2:1b-instruct-q4_0
+WorkingDirectory=/opt/project-nomad/storage
+Restart=on-failure
+RestartSec=10
+KillMode=process
+KillSignal=SIGINT
+TimeoutStopSec=60
+
+[Install]
+WantedBy=pithos-server.target multi-user.target

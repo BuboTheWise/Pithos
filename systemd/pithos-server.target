@@ -1,0 +1,9 @@
+[Unit]
+Description=Pithos Server Mode Target
+Documentation=file:///usr/share/doc/pithos/README.md
+Before=pithos-ollama-big.service
+After=network-online.target
+Wants=network-online.target nomad-migrate@main.service
+
+[Install]
+WantedBy=multi-user.target

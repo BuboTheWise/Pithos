@@ -1,0 +1,8 @@
+[Unit]
+Description=Pithos Cluster Mode Target
+Documentation=file:///usr/share/doc/pithos/README.md
+After=network-online.target pithos-ollama-big.service
+Conflicts=pithos-server.target graphical.target
+
+[Install]
+WantedBy=multi-user.target

@@ -14,15 +14,15 @@
 
 | Role | Model | Quant | File size | Pull |
 |---|---|---|---|---|
-|| **Permanent pithos-chat baseline** (on-box default) | [qwen3.5:9b](https://ollama.com/library/qwen3.5:9b) | q4_0 | ~5 GB | `ollama pull qwen3.5:9b` *(set as permanent pithos-chat baseline, 2026-11-26)* |
+| **Permanent pithos-chat baseline** (on-box default) *(set as permanent pithos-chat baseline, 2026-11-26)* | [qwen3.5:9b](https://ollama.com/library/qwen3.5:9b) | q4_0 | ~5 GB | `ollama pull qwen3.5:9b` |
 | **Quality pick** (server) | [orcarouter/Qwen3.8-27B-Uncensored-GGUF](https://huggingface.co/orcarouter/Qwen3.8-27B-Uncensored-GGUF) (base: Qwen/Qwen3.8-27B) | IQ3_XXS | 11.64 GB | `ollama pull hf.co/orcarouter/Qwen3.8-27B-Uncensored-GGUF:IQ3_XXS` (**gated**, see below) |
 | **Embeddings** (required by N.O.M.A.D.) | nomic-embed-text | v1.5 | small | Pulled by N.O.M.A.D. through the host Ollama |
 | **Desktop small model** | **TBD**: something small enough to leave room for XFCE and a browser | | | (open decision) |
 
 Notes:
 
-- **The fast pick is a mixture-of-experts model (~3B active parameters)**, so it generates much faster than a dense 27B. The quality pick is dense: slower, but more capable per byte. Pithos hasn't measured either on a BC-250 yet. **[UNVERIFIED]: please contribute numbers from `tools/ollama-bench.sh`.**
-- At about 11.6 GB, both picks leave little room for KV cache, so keep context modest (8-16K, q8_0 KV). If the desktop is running, the fast pick may not fit **[UNVERIFIED]**. That's why desktop mode gets its own small model.
+- **The baseline (qwen3.5:9b, ~5 GB) is dense** — a comfortable on-box default that leaves headroom for KV cache and a desktop session. The quality pick is dense 27B: slower, but more capable per byte. Pithos hasn't measured either on a BC-250 yet. **[UNVERIFIED]: please contribute numbers from `tools/ollama-bench.sh`.**
+- The quality pick at about 11.6 GB leaves little room for KV cache, so keep context modest (8-16K, q8_0 KV) **[UNVERIFIED]**. The ~5 GB baseline fits comfortably with a desktop session running. That's why desktop mode still gets its own small model slot.
 - **The orcarouter repo is gated.** Accept its terms on Hugging Face while logged in, and add your Ollama public key to your HF account (see the [HF Ollama docs](https://huggingface.co/docs/hub/ollama)) so `ollama pull` can authenticate. Without that, the pull fails with 401. For the archive, keep the downloaded files so other boxes don't need the gate. *(Re-sharing gated weights depends on the model's license; check before redistributing.)*
 - Smaller fallbacks available in the same repos: orcarouter IQ2_M (10.46 GB); mradermacher i1-IQ3_XXS (13.62 GB, which is **over** the comfortable ceiling).
 

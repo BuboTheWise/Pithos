@@ -1,0 +1,75 @@
+#!/usr/sbin/nft -f
+# Pithos nftables LAN-only profile for Ollama (11434) and N.O.M.A.D. (8080)
+# Issue #8: Keep ports 11434/tcp and 8080/tcp reachable from RFC1918, not exposed to WAN
+#
+# Interface note: Use 'eth0' as a placeholder if your repository is silent on LAN interface naming.
+# Replace with your actual interface (e.g., wlan0, ens18) if needed.
+# See the comment at apply-time below for verification instructions.
+
+# Flush existing ruleset (optional; comment out for incremental updates)
+# flush ruleset
+
+# Create table for Pithos LAN firewall enforcement
+table inet filter {
+    chain input {
+        type filter hook input priority 0; policy accept
+        
+        # Accept loopback traffic
+        iif "lo" accept comment "loopback"
+        
+        # Accept established and related connections (stateful tracking)
+        ct state established,related accept comment "stateful"
+        
+        # ==========================================================================
+        # Allow Ollama (11434/tcp) from RFC1918 networks on LAN interface
+        # Replace 'eth0' below with your actual LAN interface name if different
+        # ==========================================================================
+        ip saddr 10.0.0.0/8 iifname "eth0" tcp dport 11434 accept comment "OLLAMA: RFC1918 (10/8) -> eth0:11434/tcp"
+        
+        # ==========================================================================
+        # Allow N.O.M.A.D. (8080/tcp) from RFC1918 networks on LAN interface
+        # ==========================================================================
+        ip saddr 10.0.0.0/8 iifname "eth0" tcp dport 8080 accept comment "NOMAD: RFC1918 (10/8) -> eth0:8080/tcp"
+        
+        # ==========================================================================
+        # Allow Ollama from RFC1918 on 172.16.0.0/12 networks on LAN interface
+        # ==========================================================================
+        ip saddr 172.16.0.0/12 iifname "eth0" tcp dport 11434 accept comment "OLLAMA: RFC1918 (172.16/12) -> eth0:11434/tcp"
+        
+        # ==========================================================================
+        # Allow N.O.M.A.D. from RFC1918 on 172.16.0.0/12 networks on LAN interface
+        # ==========================================================================
+        ip saddr 172.16.0.0/12 iifname "eth0" tcp dport 8080 accept comment "NOMAD: RFC1918 (172.16/12) -> eth0:8080/tcp"
+        
+        # ==========================================================================
+        # Allow Ollama from RFC1918 on 192.168.0.0/16 networks on LAN interface
+        # ==========================================================================
+        ip saddr 192.168.0.0/16 iifname "eth0" tcp dport 11434 accept comment "OLLAMA: RFC1918 (192.168/16) -> eth0:11434/tcp"
+        
+        # ==========================================================================
+        # Allow N.O.M.A.D. from RFC1918 on 192.168.0.0/16 networks on LAN interface
+        # ==========================================================================
+        ip saddr 192.168.0.0/16 iifname "eth0" tcp dport 8080 accept comment "NOMAD: RFC1918 (192.168/16) -> eth0:8080/tcp"
+        
+        # ==========================================================================
+        # Drop Ollama from non-RFC1918 sources
+        # ==========================================================================
+        ip saddr != 10.0.0.0/8 tcp dport 11434 reject comment "OLLAMA: drop from non-RFC1918"
+        
+        # ==========================================================================
+        # Drop N.O.M.A.D. from non-RFC1918 sources
+        # ==========================================================================
+        ip saddr != 10.0.0.0/8 tcp dport 8080 reject comment "NOMAD: drop from non-RFC1918"
+
+    }
+}
+# Apply the ruleset (as root):
+#   nft -f /path/to/nftables/pithos.nft
+#
+# Verify syntax:
+#   nft -c -f /path/to/nftables/pithos.nft
+#
+# Check active connections:
+#   ss -ltnp | grep -E '11434|8080'
+#
+# Test connectivity from LAN and WAN hosts.

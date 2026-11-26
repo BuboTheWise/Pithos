@@ -136,7 +136,7 @@ OOMScoreAdjust=-1000
 - `MAX_LOADED_MODELS=2` lets N.O.M.A.D.'s embedding model (`nomic-embed-text:v1.5`) stay loaded next to the chat model.
 - Use KV cache `q8_0`. `q4_0` can break models that have few KV heads.
 - Check: `journalctl -u ollama -b | grep -i 'inference compute'` should show `library=Vulkan`, and `ollama ps` should show 100% GPU. ROCm init errors in the log are expected. References: [Ollama GPU docs](https://docs.ollama.com/gpu), [Ollama Linux docs](https://docs.ollama.com/linux).
-- **Firewall (nftables):** allow 11434 only from your LAN and from Docker bridges (`172.16.0.0/12`). Don't rely on ufw alone, because Docker bypasses it for published ports.
+- **Firewall (nftables):** allow 11434 (Ollama) and 8080 (N.O.M.A.D.) only from your LAN and from Docker bridges (`172.16.0.0/12`). Don't rely on ufw alone, because Docker bypasses it for published ports. Ready-to-apply profile in this repo: [`nftables/pithos.nft`](../nftables/pithos.nft) — set the LAN interface name, then verify with `nft -c -f nftables/pithos.nft` and apply as root with `nft -f nftables/pithos.nft`.
 - Pull a model (see [MODELS.md](MODELS.md)):
   ```sh
   ollama pull hf.co/mradermacher/Qwen3.6-35B-A3B-uncensored-heretic-i1-GGUF:i1-IQ2_M

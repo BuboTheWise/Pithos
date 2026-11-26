@@ -96,6 +96,36 @@ Pithos is an independent community project. It isn't affiliated with Crosstalk S
 | [BACKLOG](docs/BACKLOG.md) | Starter issues tied to milestones |
 | [CONTRIBUTING](CONTRIBUTING.md) | How to help, including hardware reports |
 
+## Meatspace to-do
+
+Physical-world build and verification work — not software issues. These need a real box, hands, and tools. Check them off as you go. Details live in [`docs/HARDWARE.md`](docs/HARDWARE.md) and [`docs/HARDWARE-SINGLE.md`](docs/HARDWARE-SINGLE.md).
+
+### Build and assembly
+- [ ] Confirm the nyacom case cover variant (neo vs classic) for the BC-250 and document the choice (was issue #22)
+- [ ] Fit-check the Apache 5800 vs 4800 enclosure and pick the better fit (was issue #27)
+- [ ] Verify cable and plug clearance at I/O, PSU, and fan points before first power-on (was issue #28)
+- [ ] Design, print, and fit-test hold-down brackets, bumper pads, and the external deflector hood (was issue #29)
+
+### Thermal and cooling
+- [ ] Run closed-case thermal + recirculation testing; confirm lid-closed temperature deltas are acceptable (was issue #23)
+
+### Power
+- [ ] Measure real wall power draw at idle, desktop, and sustained server load; validate the solar / Segway Cube estimates (was issue #5)
+- [ ] Confirm Apevia ITX-PFC500W spare availability and qualify at least one FlexATX alternative PSU (was issue #26)
+
+### Benchmarking and qualification
+- [ ] Run the first full hardware report (BC-250 on Debian 13) and clear the [UNVERIFIED] marks on kernel 7.2.x, Mesa 26.1.x and the GPU governor (was issue #3)
+- [ ] Benchmark the fast pick (i1-IQ2_M) and the quality pick (IQ3_XXS) at 4K/16K context; record numbers in MODELS.md (was issue #4)
+- [ ] Cluster benchmark: 1 vs 2 vs 3 boxes — tokens/s and max model size, documented honestly (was issue #16)
+- [ ] Benchmark default 1G interlink vs optional 5GbE; qualify the faster path only if prefill actually saturates 1G (was issue #24)
+- [ ] Qualify a 5GBASE-T switch for clusters of three or more units (~$100–200) (was issue #25)
+
+### Model selection
+- [ ] Choose the desktop-mode small model and record measured memory use next to XFCE + Firefox + N.O.M.A.D. (was issue #12)
+
+### Monitoring and safety
+- [ ] Add pull-fan tachometer monitoring and over-temperature alerts for the GDDR6 hot side and other unmonitored areas (was issue #31)
+
 ## Safety
 
 This project involves mains wiring, high-current 12 V power, lithium power stations and hot electronics inside a closed case. Get help if you aren't qualified, and test everything with the lid open before trusting it closed. Nothing here is a substitute for real emergency services.

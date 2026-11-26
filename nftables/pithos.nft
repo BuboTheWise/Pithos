@@ -52,14 +52,14 @@ table inet filter {
         ip saddr 192.168.0.0/16 iifname "eth0" tcp dport 8080 accept comment "NOMAD: RFC1918 (192.168/16) -> eth0:8080/tcp"
         
         # ==========================================================================
-        # Drop Ollama from non-RFC1918 sources
+        # Drop Ollama from non-RFC1918 sources (any interface)
         # ==========================================================================
-        ip saddr != 10.0.0.0/8 tcp dport 11434 reject comment "OLLAMA: drop from non-RFC1918"
+        ip saddr != { 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 } tcp dport 11434 drop comment "OLLAMA: drop non-RFC1918"
         
         # ==========================================================================
-        # Drop N.O.M.A.D. from non-RFC1918 sources
+        # Drop N.O.M.A.D. from non-RFC1918 sources (any interface)
         # ==========================================================================
-        ip saddr != 10.0.0.0/8 tcp dport 8080 reject comment "NOMAD: drop from non-RFC1918"
+        ip saddr != { 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16 } tcp dport 8080 drop comment "NOMAD: drop non-RFC1918"
 
     }
 }

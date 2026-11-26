@@ -41,7 +41,7 @@ Everything needed to make the GPU usable:
 | BIOS: 512 MB UMA, IOMMU off, Secure Boot off | Required memory layout; unsigned optional modules |
 | Optional: nct6687d sensors, ACPI fix, 40-CU unlock | Monitoring and performance |
 
-All of this is specific to the hardware and owned by Pithos. Where community projects already exist (the governor, bc250_memcfg, the ACPI fix), Pithos packages or references them instead of forking.
+All of this is specific to the hardware and owned by Pithos. Where community projects already exist (the governor, bc250_memcfg, the ACPI fix), Pithos packages or references them using upstream with Pithos overrides instead of forking.
 
 ## 3. Inference
 
@@ -56,7 +56,7 @@ All of this is specific to the hardware and owned by Pithos. Where community pro
   2. runs the upstream `install_nomad.sh`;
   3. sets N.O.M.A.D.'s AI Assistant **remote Ollama URL** to `http://<LAN IP>:11434`, so N.O.M.A.D. stops its own `nomad_ollama` container.
 - **N.O.M.A.D. has no authentication**, so Pithos keeps it on the LAN.
-- **Multi-distro work:** adapt N.O.M.A.D. installation for non-Debian bases where upstream will accept changes, rather than maintaining a fork. Pithos should never need its own N.O.M.A.D. fork.
+- **Multi-distro work:** adapt N.O.M.A.D. installation for non-Debian bases where upstream will accept changes using Pithos overrides, rather than maintaining a fork. Pithos should never need its own N.O.M.A.D. fork. All N.O.M.A.D. advanced-install work lives in Pithos. Install upstream Project N.O.M.A.D. from its pristine compose template plus a Pithos override. Do NOT maintain a fork.
 
 ```
  browser ──► N.O.M.A.D. (Docker, :8080) ──► host Ollama (:11434, Vulkan) ──► BC-250 GPU

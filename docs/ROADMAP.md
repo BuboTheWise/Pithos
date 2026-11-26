@@ -22,7 +22,7 @@ Status: **pre-alpha / planning.** The milestones are ordered by dependency. Date
 
 ## Principles for every milestone
 
-- **Upstream first.** Fixes that help everyone go to N.O.M.A.D., llama.cpp, Ollama or the BC-250 community projects, not into a Pithos fork.
+- **Upstream first.** All N.O.M.A.D. advanced-install work lives in Pithos. Install upstream Project N.O.M.A.D. from its pristine compose template plus a Pithos override. Do NOT maintain a fork. Fixes that help everyone go to N.O.M.A.D., llama.cpp, Ollama or the BC-250 community projects with Pithos overrides, not into a Pithos fork.
 - **Debian behavior stays the reference.** Multi-distro work must not change the Debian 13 path.
 - **Offline-capable.** Anything needed to rebuild a box should be archivable.
 - **Mark what's unproven.** Use [UNVERIFIED] until a hardware report confirms it.

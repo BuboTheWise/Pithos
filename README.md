@@ -78,7 +78,7 @@ Milestone 2 adds desktop/server mode switching, and Milestone 4 adds clustering.
 ## Relationship to Project N.O.M.A.D.
 
 - **[Project N.O.M.A.D.](https://github.com/Crosstalk-Solutions/project-nomad)** (Crosstalk Solutions, Apache-2.0) supplies the offline library and the AI chat front end. Upstream targets Debian-based systems, with Ubuntu recommended. **Pithos Milestone 1 uses the stock upstream installer, unmodified, on Debian 13.** Debian 13 isn't on upstream's named support list, so this is [UNVERIFIED] until tested.
-- **Upstream first.** Wherever a change helps everyone, such as a Vulkan GPU path in N.O.M.A.D. or installer fixes, Pithos aims to get it merged upstream instead of carrying a fork. The fork is a bridge, not a destination.
+- **Upstream first.** All N.O.M.A.D. advanced-install work lives in Pithos. Install upstream Project N.O.M.A.D. from its pristine compose template plus a Pithos override. Do NOT maintain a fork. References to `BuboTheWise/project-nomad` no longer resolve (404), so do not push, comment, or open issues there; any new N.O.M.A.D. work should live in Pithos with overrides.
 - Pithos owns the parts specific to this hardware: kernel and Mesa versions, the GPU governor, memory tuning, host Vulkan inference, mode switching, clustering, the hardware build and, later, a flashable image.
 
 Pithos is an independent community project. It isn't affiliated with Crosstalk Solutions, ASRock or AMD.

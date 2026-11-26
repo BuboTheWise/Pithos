@@ -71,10 +71,10 @@ sudo reboot
 In `/etc/default/grub`:
 
 ```
-GRUB_CMDLINE_LINUX_DEFAULT="quiet amdgpu.sg_display=0 ttm.pages_limit=4194304 ttm.page_pool_size=4194304"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet amdgpu.sg_display=0 ttm.pages_limit=3959290 ttm.page_pool_size=3959290 amdgpu.gttsize=15466"
 ```
 
-Then run `sudo update-grub`. The ttm values give a 16 GiB GTT. Don't use the deprecated `amdgpu.gttsize`.
+Then run `sudo update-grub`. These are the tested values for the BC-250: a 15466 MiB (~15.1 GiB) GTT ceiling plus the 512 MB fixed VRAM carve-out. GTT is a ceiling, not a reservation — don't size it to a full 16 GiB, which is more than the OS can hand out after the carve-out. The primary box currently runs driver defaults (`pages_limit=8162647`, `page_pool_size=0`; verified 2026-11-26, no ttm params in `/proc/cmdline`), so these values are recommended per the hardware reference, not yet verified on a running box.
 
 ## 5. GPU governor (required)
 
@@ -92,13 +92,14 @@ sudo apt install ./cyan-skillfish-governor-smu_0.4.14-1_amd64.deb   # enables an
 ## 6. Memory tuning
 
 ```sh
-echo "options ttm pages_limit=4194304 page_pool_size=4194304" | sudo tee /etc/modprobe.d/ttm-gpu-memory.conf
-printf 'w /sys/module/ttm/parameters/pages_limit - - - - 4194304\nw /sys/module/ttm/parameters/page_pool_size - - - - 4194304\n' \
+echo "options ttm pages_limit=3959290 page_pool_size=3959290" | sudo tee /etc/modprobe.d/ttm-gpu-memory.conf
+printf 'w /sys/module/ttm/parameters/pages_limit - - - - 3959290\nw /sys/module/ttm/parameters/page_pool_size - - - - 3959290\n' \
   | sudo tee /etc/tmpfiles.d/gpu-ttm-memory.conf
 sudo update-initramfs -u
 ```
 
-- After rebooting, `cat /sys/module/ttm/parameters/pages_limit` should be `4194304`. (`3145728` means a silent 12 GiB cap; tmpfiles.d is applied last and wins.) `cat /sys/class/drm/card*/device/mem_info_gtt_total` should be `17179869184`.
+- After reboot, `cat /sys/module/ttm/parameters/pages_limit` should be `3959290` (a `3145728` means a silent 12 GiB cap; tmpfiles.d is applied last and wins). `cat /sys/class/drm/card*/device/mem_info_gtt_total` should be `16217251840` (15466 MiB).
+- **GTT/UMA context (BC-250):** config source is the kernel cmdline (`ttm.pages_limit=`, `amdgpu.gttsize=`) and/or `/etc/modprobe.d/ttm-gpu-memory.conf`. The primary box currently runs driver defaults (`pages_limit=8162647`, `page_pool_size=0`; verified 2026-11-26, no ttm params in `/proc/cmdline`) — the values above are the recommended ones from the hardware reference, not yet verified on a running box.
 - 16 GiB swapfile on NVMe:
   ```sh
   sudo fallocate -l 16G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon -p 10 /swapfile
@@ -190,8 +191,8 @@ M1 uses the **unmodified upstream installer** from [Crosstalk-Solutions/project-
 uname -r                                            # 7.2.x-amd64 (bpo)
 vulkaninfo --summary | grep -i deviceName           # RADV GFX1013
 apt policy mesa-vulkan-drivers                      # 26.1.x~bpo13
-cat /sys/module/ttm/parameters/pages_limit          # 4194304
-cat /sys/class/drm/card*/device/mem_info_gtt_total  # 17179869184
+cat /sys/module/ttm/parameters/pages_limit          # 3959290
+cat /sys/class/drm/card*/device/mem_info_gtt_total  # 16217251840 (15466 MiB)
 systemctl status cyan-skillfish-governor-smu
 journalctl -u ollama -b | grep 'inference compute'  # library=Vulkan
 ollama ps                                           # 100% GPU

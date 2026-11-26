@@ -34,7 +34,7 @@ Everything needed to make the GPU usable:
 | Piece | Why |
 |---|---|
 | Backports kernel 7.2.x + Mesa 26.1.x + firmware | Stock trixie Mesa (25.0.7) can't drive gfx1013 with RADV |
-| Kernel params `amdgpu.sg_display=0 ttm.pages_limit=4194304 ttm.page_pool_size=4194304` | Display stability; 16 GiB GTT for the GPU |
+| Kernel params `amdgpu.sg_display=0 ttm.pages_limit=3959290 ttm.page_pool_size=3959290 amdgpu.gttsize=15466` | Display stability; 15466 MiB (~15.1 GiB) GTT ceiling — tested values, not the 16 GiB default, which is more than the OS can hand out after the 512 MB carve-out. The primary box currently runs driver defaults (`pages_limit`=8162647, `page_pool_size`=0; verified 2026-11-26) |
 | modprobe.d + tmpfiles.d ttm settings, `update-initramfs` | Makes the GTT size stick (tmpfiles.d wins last) |
 | 16 GiB swapfile | Headroom when loading models |
 | `cyan-skillfish-governor-smu` (.deb) | Without it the GPU is stuck at 1500 MHz |
